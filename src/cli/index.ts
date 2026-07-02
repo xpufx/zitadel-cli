@@ -11,6 +11,8 @@ import { sessionCommand } from "./commands/session";
 import { authorizationCommand } from "./commands/authorization";
 import { webkeyCommand } from "./commands/webkey";
 import { idpCommand } from "./commands/idp";
+import { systemCommand } from "./commands/system";
+import { instanceCommand } from "./commands/instance";
 
 const program = new Command();
 
@@ -30,6 +32,8 @@ const resources = [
   { name: "authorization", description: "Manage authorizations", setup: authorizationCommand },
   { name: "webkey", description: "Manage web keys", setup: webkeyCommand },
   { name: "idp", description: "Identity providers", setup: idpCommand },
+  { name: "system", description: "System API (self-hosted)", setup: systemCommand },
+  { name: "instance", description: "Manage instances", setup: instanceCommand },
 ];
 
 for (const r of resources) {
