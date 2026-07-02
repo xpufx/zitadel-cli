@@ -7,7 +7,7 @@ import { createSettingsServiceClient } from "@zitadel/client/v2";
 import { createSessionServiceClient } from "@zitadel/client/v2";
 import { createOIDCServiceClient } from "@zitadel/client/v2";
 import { createSAMLServiceClient } from "@zitadel/client/v2";
-import { createOrganizationServiceClient } from "@zitadel/client/v2";
+import { OrganizationService as OrgV2betaService } from "@zitadel/proto/zitadel/org/v2beta/org_service_pb.js";
 import { createFeatureServiceClient } from "@zitadel/client/v2";
 import { createIdpServiceClient } from "@zitadel/client/v2";
 
@@ -23,6 +23,7 @@ import { SystemService } from "@zitadel/proto/zitadel/system_pb.js";
 
 import type { ZitadelConfig } from "./types";
 
+export const createOrganizationServiceClient = createClientFor(OrgV2betaService);
 export const createWebKeyServiceClient = createClientFor(WebKeyService);
 export const createInstanceServiceClient = createClientFor(InstanceService);
 export const createProjectServiceClient = createClientFor(ProjectService);

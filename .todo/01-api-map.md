@@ -74,9 +74,24 @@
 
 ## OrganizationService (v2) — 2/14 available in npm package
 
-[x] AddOrganization           org create --name
+[x] CreateOrganization        org create --name
 [x] ListOrganizations         org list
-[ ] (remaining methods not in npm v2 package)
+[x] UpdateOrganization        org update <id> --name
+[x] DeleteOrganization        org delete <id> [--confirm]
+[x] ActivateOrganization      org activate <id>
+[x] DeactivateOrganization    org deactivate <id>
+
+### Domains
+[x] AddOrganizationDomain            org domain add <id> --domain
+[x] ListOrganizationDomains          org domain list <id>
+[x] DeleteOrganizationDomain         org domain delete <id> --domain
+[x] GenerateOrganizationDomainValidation  org domain generate-validation <id> --domain --type
+[x] VerifyOrganizationDomain         org domain verify <id> --domain
+
+### Metadata
+[x] SetOrganizationMetadata          org metadata set <id> --key --value
+[x] ListOrganizationMetadata        org metadata list <id>
+[x] DeleteOrganizationMetadata      org metadata delete <id> --key
 
 ---
 
@@ -106,17 +121,16 @@
 
 [x] GetApplication            app get <id>
 [x] ListApplications          app list --project-id
+[x] CreateApplication         app create --project-id --name [--type]
+[x] UpdateApplication         app update <id> --project-id [--name]
 [x] DeleteApplication         app delete <id> --project-id [--confirm]
-
-[ ] CreateApplication         app create --project-id --name
-[ ] UpdateApplication         app update <id> --project-id
-[ ] DeactivateApplication     app deactivate <id> --project-id
-[ ] ReactivateApplication     app reactivate <id> --project-id
-[ ] RegenerateClientSecret    app secret generate --project-id --app-id
-[ ] CreateApplicationKey      app key create --project-id --app-id
-[ ] GetApplicationKey         app key get <id> --project-id --app-id --key-id
-[ ] ListApplicationKeys       app key list --project-id --app-id
-[ ] DeleteApplicationKey      app key delete --project-id --app-id --key-id
+[x] DeactivateApplication     app deactivate <id> --project-id
+[x] ReactivateApplication     app reactivate <id> --project-id
+[x] RegenerateClientSecret    app secret generate <id> --project-id
+[x] CreateApplicationKey      app key create <id> --project-id
+[x] GetApplicationKey         app key get <key-id> --project-id --app-id
+[x] ListApplicationKeys       app key list --project-id
+[x] DeleteApplicationKey      app key delete <key-id> --project-id --app-id
 
 ---
 
@@ -124,9 +138,9 @@
 
 [x] GetSession                session get <id>
 [x] ListSessions              session list
+[x] CreateSession             session create
+[x] SetSession                session set <id> --token
 [x] DeleteSession             session delete <id>
-[ ] CreateSession             session create
-[ ] SetSession                session set <id>
 
 ---
 
@@ -172,17 +186,17 @@
 [x] DeleteAuthorization       authorization delete <id>
 [x] ActivateAuthorization     authorization activate <id>
 [x] DeactivateAuthorization   authorization deactivate <id>
-[ ] CreateAuthorization       authorization create
-[ ] UpdateAuthorization       authorization update <id>
+[x] CreateAuthorization       authorization create --user-id --project-id --role-keys
+[x] UpdateAuthorization       authorization update <id> --role-keys
 
 ---
 
 ## WebKeyService — 2/4 ✅
 
 [x] ListWebKeys               webkey list
+[x] CreateWebKey              webkey create [--type]
 [x] ActivateWebKey            webkey activate <id>
-[ ] CreateWebKey              webkey create
-[ ] DeleteWebKey              webkey delete <id>
+[x] DeleteWebKey              webkey delete <id>
 
 ---
 
