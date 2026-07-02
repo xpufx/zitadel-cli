@@ -84,22 +84,21 @@
 
 [x] GetProject                project get <id>
 [x] ListProjects              project list
+[x] CreateProject             project create --org-id --name
+[x] UpdateProject             project update <id> [--name]
 [x] DeleteProject             project delete <id> [--confirm]
 [x] DeactivateProject         project deactivate <id>
 [x] ActivateProject           project activate <id>
-
-[ ] CreateProject             project create --name
-[ ] UpdateProject             project update <id>
-[ ] AddProjectRole            project role add <id> --key --display-name
-[ ] UpdateProjectRole         project role update <id> --key
-[ ] RemoveProjectRole         project role remove <id> --key
-[ ] ListProjectRoles          project role list <id>
-[ ] CreateProjectGrant        project grant create <id> --org-id
-[ ] UpdateProjectGrant        project grant update <id> --grant-id
-[ ] DeleteProjectGrant        project grant delete <id> --grant-id
-[ ] ActivateProjectGrant      project grant activate <id> --grant-id
-[ ] DeactivateProjectGrant    project grant deactivate <id> --grant-id
-[ ] ListProjectGrants         project grant list <id>
+[x] AddProjectRole            project role add <id> --key --display-name
+[x] UpdateProjectRole         project role update <id> <key> [--display-name]
+[x] RemoveProjectRole         project role remove <id> <key>
+[x] ListProjectRoles          project role list <id>
+[x] CreateProjectGrant        project grant create <id> --org-id --role-keys
+[x] UpdateProjectGrant        project grant update <id> <grant-org-id> --role-keys
+[x] DeleteProjectGrant        project grant delete <id> <grant-org-id> [--confirm]
+[x] ActivateProjectGrant      project grant activate <id> <grant-org-id>
+[x] DeactivateProjectGrant    project grant deactivate <id> <grant-org-id>
+[x] ListProjectGrants         project grant list
 
 ---
 
@@ -208,11 +207,46 @@
 
 ---
 
-## SystemService (v1) — REST fallback
+## SystemService (v1) — REST fallback, all 24 RPCs in npm package
 
-[x] Instance list              system instance list
-[x] Instance get               system instance get <id>
-[x] Instance create            system instance create --name
+### Instance lifecycle
+[ ] Healthz                    system healthz
+[ ] ListInstances              system instance list
+[ ] GetInstance                system instance get <id>
+[ ] CreateInstance             system instance create --name
+[ ] UpdateInstance             system instance update <id> --name
+[ ] RemoveInstance             system instance delete <id> [--confirm]
+
+### IAM Members
+[ ] ListIAMMembers             system iam-members list <id>
+
+### Domains
+[ ] ExistsDomain               system domain exists <domain>
+[ ] ListDomains                system domain list <instance-id>
+[ ] AddDomain                  system domain add <instance-id> --domain
+[ ] RemoveDomain               system domain remove <instance-id> --domain
+[ ] SetPrimaryDomain           system domain set-primary <instance-id> --domain
+
+### Views (debug)
+[ ] ListViews                  system views list
+[ ] ClearView                  system view clear <database> <view-name>
+
+### Failed Events (debug)
+[ ] ListFailedEvents           system failed-events list
+[ ] RemoveFailedEvent          system failed-event remove <database> <view-name> <sequence>
+
+### Quotas
+[ ] AddQuota                   system quota add <instance-id> --unit --amount
+[ ] SetQuota                   system quota set <instance-id> --unit --amount
+[ ] RemoveQuota                system quota remove <instance-id> <unit>
+
+### Features
+[ ] SetInstanceFeature         system feature set <instance-id> --key --value
+
+### Limits
+[ ] SetLimits                  system limits set <instance-id>
+[ ] BulkSetLimits              system limits bulk-set
+[ ] ResetLimits                system limits reset <instance-id>
 
 ---
 
