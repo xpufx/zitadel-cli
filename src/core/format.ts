@@ -2,13 +2,14 @@ import pc from "picocolors";
 
 export type OutputFormat = "table" | "json" | "yaml";
 
+let _format: OutputFormat = "table";
+
 export function setOutputFormat(format: OutputFormat): void {
   _format = format;
 }
 
-let _format: OutputFormat = "table";
-
-const jsonReplacer = (_key: string, value: unknown) => typeof value === "bigint" ? Number(value) : value;
+const jsonReplacer = (_key: string, value: unknown): unknown =>
+  typeof value === "bigint" ? Number(value) : value;
 
 export function printResult(data: unknown): void {
   switch (_format) {
@@ -19,39 +20,67 @@ export function printResult(data: unknown): void {
       console.log(toYaml(data));
       break;
     case "table":
-      printTable(data);
+      printTable(stripProto(data));
       break;
   }
 }
 
+function stripProto(val: unknown): unknown {
+  if (Array.isArray(val)) return val.map(stripProto);
+  if (val && typeof val === "object") {
+    const obj = val as Record<string, unknown>;
+    if (obj.case) return String(obj.case);
+    if (obj.seconds !== undefined && obj.nanos !== undefined) {
+      return new Date(Number(obj.seconds) * 1000).toISOString();
+    }
+    const cleaned: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(obj)) {
+      if (k.startsWith("$")) continue;
+      cleaned[k] = stripProto(v);
+    }
+    return cleaned;
+  }
+  return val;
+}
+
 function printTable(data: unknown): void {
   if (Array.isArray(data) && data.length > 0 && typeof data[0] === "object" && data[0] !== null) {
-    const headers = Object.keys(data[0] as Record<string, unknown>);
-    const rows = data.map((item) => headers.map((h) => formatCell((item as Record<string, unknown>)[h])));
-    const colWidths = headers.map((h, i) => Math.max(h.length, ...rows.map((r) => r[i]!.length)));
-    header(headers, colWidths);
-    for (const row of rows) printRow(row, colWidths);
+    const items = data as Record<string, unknown>[];
+    const keys = [...new Set(items.flatMap(Object.keys))];
+    const skip = new Set(["details", "$typeName", "$unknown"]);
+    const cols = keys.filter((k) => !skip.has(k) && !k.startsWith("$"));
+    if (cols.length === 0) cols.push(...keys.slice(0, 5));
+
+    const strRows = items.map((item) => cols.map((c) => cellStr(item[c])));
+    const widths = cols.map((c, i) => Math.max(c.length, ...strRows.map((r) => r[i]!.length)));
+
+    header(cols, widths);
+    for (const r of strRows) row(r, widths);
   } else if (typeof data === "object" && data !== null) {
-    for (const [k, v] of Object.entries(data)) {
+    const obj = data as Record<string, unknown>;
+    for (const [k, v] of Object.entries(obj)) {
       if (k.startsWith("$")) continue;
-      console.log(`${pc.bold(k)}: ${formatCell(v)}`);
+      console.log(`${pc.bold(padKey(k))}: ${cellStr(v)}`);
     }
   } else {
     console.log(String(data));
   }
 }
 
+function padKey(k: string): string {
+  return k.padEnd(20);
+}
+
 function header(headers: string[], widths: number[]): void {
-  const line = headers.map((h, i) => pc.bold(h.padEnd(widths[i]!))).join("  ");
-  console.log(line);
+  console.log(headers.map((h, i) => pc.bold(h.padEnd(widths[i]!))).join("  "));
   console.log(widths.map((w) => "─".repeat(w)).join("──"));
 }
 
-function printRow(row: string[], widths: number[]): void {
-  console.log(row.map((c, i) => c.padEnd(widths[i]!)).join("  "));
+function row(r: string[], widths: number[]): void {
+  console.log(r.map((c, i) => c.padEnd(widths[i]!)).join("  "));
 }
 
-function formatCell(val: unknown): string {
+function cellStr(val: unknown): string {
   if (val === null || val === undefined) return pc.dim("-");
   if (typeof val === "boolean") return val ? pc.green("yes") : pc.red("no");
   if (typeof val === "bigint") return Number(val).toLocaleString();
@@ -64,12 +93,9 @@ function toYaml(data: unknown, indent = 0): string {
   if (data === null || data === undefined) return `${pad}null`;
   if (typeof data === "string") return `${pad}"${data}"`;
   if (typeof data === "number" || typeof data === "boolean" || typeof data === "bigint") return `${pad}${data}`;
-  if (Array.isArray(data)) {
-    if (data.length === 0) return `${pad}[]`;
-    return data.map((item) => `${pad}- ${toYaml(item, indent + 1).trimStart()}`).join("\n");
-  }
+  if (Array.isArray(data)) return data.map((item) => `${pad}- ${toYaml(item, indent + 1).trimStart()}`).join("\n");
   if (typeof data === "object") {
-    const entries = Object.entries(data as Record<string, unknown>);
+    const entries = Object.entries(data as Record<string, unknown>).filter(([k]) => !k.startsWith("$"));
     if (entries.length === 0) return `${pad}{}`;
     return entries.map(([k, v]) => `${pad}${k}: ${toYaml(v, indent + 1).trimStart()}`).join("\n");
   }

@@ -4,27 +4,42 @@ import { join } from "node:path";
 import { parse } from "smol-toml";
 import type { ZitadelConfig } from "./types";
 
-const ENV_MAP = {
-  ZITADEL_API_URL: "apiUrl" as const,
-  ZITADEL_TOKEN: "token" as const,
-  ZITADEL_ORG_ID: "defaultOrgId" as const,
-  ZITADEL_TOKEN_TYPE: "tokenType" as const,
-  ZITADEL_SYSTEM_KEY: "systemKey" as const,
-  ZITADEL_SYSTEM_USER_ID: "systemUserId" as const,
+const ENV_MAP: Record<string, keyof ZitadelConfig> = {
+  ZITADEL_API_URL: "apiUrl",
+  ZITADEL_TOKEN: "token",
+  ZITADEL_ORG_ID: "defaultOrgId",
+  ZITADEL_TOKEN_TYPE: "tokenType",
+  ZITADEL_SYSTEM_KEY: "systemKey",
+  ZITADEL_SYSTEM_USER_ID: "systemUserId",
+};
+
+const TOML_MAP: Record<string, keyof ZitadelConfig> = {
+  api_url: "apiUrl",
+  token: "token",
+  default_org_id: "defaultOrgId",
+  token_type: "tokenType",
+  system_key: "systemKey",
+  system_user_id: "systemUserId",
 };
 
 function loadConfigFile(path: string): Partial<ZitadelConfig> | null {
   try {
     if (!existsSync(path)) return null;
     const raw = readFileSync(path, "utf-8");
-    return parse(raw) as Partial<ZitadelConfig>;
+    const parsed = parse(raw) as Record<string, unknown>;
+    const result: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(parsed)) {
+      const mapped = TOML_MAP[key] ?? key;
+      result[mapped] = value;
+    }
+    return result as Partial<ZitadelConfig>;
   } catch {
     return null;
   }
 }
 
 function loadEnv(): Partial<ZitadelConfig> {
-  const result: Record<string, string | undefined> = {};
+  const result: Record<string, string> = {};
   for (const [env, key] of Object.entries(ENV_MAP)) {
     const val = process.env[env];
     if (val) result[key] = val;

@@ -5,7 +5,6 @@ import { getClients } from "../state";
 export function orgCommand(cmd: Command): void {
   cmd
     .command("create")
-    .description("Create an organization")
     .requiredOption("--name <name>")
     .action(async (opts) => {
       try {

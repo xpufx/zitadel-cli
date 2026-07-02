@@ -5,7 +5,6 @@ import { getClients } from "../state";
 export function userCommand(cmd: Command): void {
   cmd
     .command("list")
-    .option("--org-id <id>")
     .option("--limit <n>", "", "50")
     .action(async (opts) => {
       try {
@@ -64,6 +63,47 @@ export function userCommand(cmd: Command): void {
     .action(async (id) => {
       try {
         const res = await getClients().user.unlockUser({ userId: id });
+        printResult(res);
+      } catch (e) { handleError(e); }
+    });
+
+  const email = cmd.command("email").description("Manage user email");
+  email
+    .command("set <id>")
+    .requiredOption("--email <email>")
+    .action(async (id, opts) => {
+      try {
+        const res = await getClients().user.setEmail({ userId: id, email: opts.email });
+        printResult(res);
+      } catch (e) { handleError(e); }
+    });
+
+  const phone = cmd.command("phone").description("Manage user phone");
+  phone
+    .command("set <id>")
+    .requiredOption("--phone <phone>")
+    .action(async (id, opts) => {
+      try {
+        const res = await getClients().user.setPhone({ userId: id, phone: opts.phone });
+        printResult(res);
+      } catch (e) { handleError(e); }
+    });
+  phone
+    .command("remove <id>")
+    .action(async (id) => {
+      try {
+        const res = await getClients().user.removePhone({ userId: id });
+        printResult(res);
+      } catch (e) { handleError(e); }
+    });
+
+  const pwd = cmd.command("password").description("Manage user password");
+  pwd
+    .command("set <id>")
+    .requiredOption("--password <password>")
+    .action(async (id, opts) => {
+      try {
+        const res = await getClients().user.setPassword({ userId: id, newPassword: { password: opts.password } });
         printResult(res);
       } catch (e) { handleError(e); }
     });

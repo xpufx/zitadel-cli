@@ -2,4 +2,5 @@ vendor/
 node_modules/
 dist/
 .env
+.zitadel.toml
 *.tgz

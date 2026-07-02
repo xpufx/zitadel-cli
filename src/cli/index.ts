@@ -5,6 +5,7 @@ import { userCommand } from "./commands/user";
 import { orgCommand } from "./commands/org";
 import { projectCommand } from "./commands/project";
 import { settingsCommand } from "./commands/settings";
+import { appCommand } from "./commands/app";
 
 const program = new Command();
 
@@ -18,6 +19,7 @@ const resources = [
   { name: "org", description: "Manage organizations", setup: orgCommand },
   { name: "project", description: "Manage projects", setup: projectCommand },
   { name: "settings", description: "Get settings", setup: settingsCommand },
+  { name: "app", description: "Manage applications", setup: appCommand },
 ];
 
 for (const r of resources) {
