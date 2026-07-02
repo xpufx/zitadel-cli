@@ -8,8 +8,8 @@
   "scripts": {
     "cli": "tsx src/cli/index.ts",
     "cli:build": "tsup",
-    "web": "vite src/web",
-    "web:build": "vite build src/web",
+    "web": "vite",
+    "web:build": "vite build",
     "test": "vitest",
     "typecheck": "tsc --noEmit"
   },
