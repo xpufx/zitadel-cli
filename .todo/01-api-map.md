@@ -1,356 +1,224 @@
-# API Implementation Checklist
+# API Implementation Status
 
 ## Legend
-- `[ ]` not started
-- `[~]` in progress
-- `[x]` done
-- `v2 ✅` = exported by `@zitadel/client`
-- `v2 🔧` = proto exists, wrap ourselves
-- `v1 ⚠️` = fallback (no v2 equivalent yet)
+- [x] implemented and wired in CLI
+- [ ] not implemented
 
 ---
 
-## UserService (`v2 ✅`)
+## UserService — 36/63 ✅
 
-### Core
-- [x] `CreateUser` — user create --machine
-- [x] `AddHumanUser` — user create --human
-- [ ] `GetUserByID` — user get <id>
-- [ ] `ListUsers` — user list
-- [x] `UpdateUser` — user update <id>
-- [x] `UpdateHumanUser` — user update-human <id>
-- [ ] `DeleteUser` — user delete <id>
-- [ ] `DeactivateUser` — user deactivate <id>
-- [ ] `ReactivateUser` — user reactivate <id>
-- [ ] `LockUser` — user lock <id>
-- [ ] `UnlockUser` — user unlock <id>
+[x] CreateUser               user create --name --org-id
+[x] AddHumanUser              user create-human --email --first-name --last-name --org-id
+[x] GetUserByID               user get <id>
+[x] ListUsers                 user list [--limit]
+[x] UpdateUser                user update <id> [--username]
+[x] UpdateHumanUser           user update-human <id> [--username] [--first-name] [--last-name]
+[x] DeleteUser                user delete <id>
+[x] DeactivateUser            user deactivate <id>
+[x] ReactivateUser            user reactivate <id>
+[x] LockUser                  user lock <id>
+[x] UnlockUser                user unlock <id>
+[x] SetEmail                  user email set <id> --email
+[x] VerifyEmail               user email verify <id> --code
+[x] ResendEmailCode           user email resend-code <id>
+[x] SendEmailCode             user email send-code <id>
+[x] SetPhone                  user phone set <id> --phone
+[x] RemovePhone               user phone remove <id>
+[x] VerifyPhone               user phone verify <id> --code
+[x] ResendPhoneCode           user phone resend-code <id>
+[x] SetPassword               user password set <id> --password
+[x] PasswordReset             user password reset <id>
+[x] ListPasskeys              user passkeys <id>
+[x] RemovePasskey             user remove-passkey <id> <passkey-id>
+[x] ListKeys                  user keys <id>
+[x] RemoveKey                 user remove-key <id> <key-id>
+[x] ListPersonalAccessTokens  user pats <id>
+[x] RemovePersonalAccessToken user remove-pat <id> <token-id>
+[x] ListIDPLinks              user idp-links <id>
+[x] RemoveIDPLink             user remove-idp-link <id> <idp-id>
+[x] SetUserMetadata           user metadata set <id> --key --value
+[x] ListUserMetadata          user metadata list <id>
+[x] DeleteUserMetadata        user metadata delete <id> --key
+[x] ListAuthenticationMethodTypes  user auth-methods <id>
+[x] ListAuthenticationFactors      user auth-factors <id>
 
-### Email
-- [ ] `SetEmail` — user email set <id> --email
-- [x] `ResendEmailCode` — user email resend-code <id>
-- [x] `SendEmailCode` — user email send-code <id>
-- [x] `VerifyEmail` — user email verify <id> --code
-
-### Phone
-- [ ] `SetPhone` — user phone set <id> --phone
-- [ ] `RemovePhone` — user phone remove <id>
-- [x] `ResendPhoneCode` — user phone resend-code <id>
-- [x] `VerifyPhone` — user phone verify <id> --code
-
-### Password
-- [ ] `SetPassword` — user password set <id>
-- [x] `PasswordReset` — user password reset <id>
-
-### Auth Factors
-- [ ] `RegisterPasskey` — user passkey register <id>
-- [ ] `VerifyPasskeyRegistration` — user passkey verify <id>
-- [ ] `CreatePasskeyRegistrationLink` — user passkey link <id>
-- [ ] `ListPasskeys` — user passkey list <id>
-- [ ] `RemovePasskey` — user passkey remove <id> --passkey-id
-- [ ] `RegisterU2F` — user u2f register <id>
-- [ ] `VerifyU2FRegistration` — user u2f verify <id>
-- [ ] `RemoveU2F` — user u2f remove <id> --u2f-id
-- [ ] `RegisterTOTP` — user totp register <id>
-- [ ] `VerifyTOTPRegistration` — user totp verify <id> --code
-- [ ] `RemoveTOTP` — user totp remove <id>
-- [ ] `AddOTPSMS` — user otp-sms add <id>
-- [ ] `RemoveOTPSMS` — user otp-sms remove <id>
-- [ ] `AddOTPEmail` — user otp-email add <id>
-- [ ] `RemoveOTPEmail` — user otp-email remove <id>
-- [ ] `GenerateRecoveryCodes` — user recovery-codes generate <id>
-- [ ] `RemoveRecoveryCodes` — user recovery-codes remove <id>
-- [ ] `HumanMFAInitSkipped` — user mfa-skip <id>
-- [ ] `ListAuthenticationMethodTypes` — user auth-methods list <id>
-- [ ] `ListAuthenticationFactors` — user auth-factors list <id>
-
-### Identity Provider Links
-- [ ] `StartIdentityProviderIntent` — (internal/login UI)
-- [ ] `RetrieveIdentityProviderIntent` — (internal/login UI)
-- [ ] `AddIDPLink` — user idp-link add <id> --idp-id
-- [ ] `ListIDPLinks` — user idp-link list <id>
-- [ ] `RemoveIDPLink` — user idp-link remove <id> --link-id
-
-### Keys & Secrets
-- [ ] `AddSecret` — user secret add <id>
-- [ ] `RemoveSecret` — user secret remove <id>
-- [ ] `AddKey` — user key add <id>
-- [ ] `RemoveKey` — user key remove <id> --key-id
-- [ ] `ListKeys` — user key list <id>
-- [ ] `AddPersonalAccessToken` — user pat add <id>
-- [ ] `RemovePersonalAccessToken` — user pat remove <id> --token-id
-- [ ] `ListPersonalAccessTokens` — user pat list <id>
-
-### Metadata
-- [ ] `SetUserMetadata` — user metadata set <id> --key --value
-- [ ] `ListUserMetadata` — user metadata list <id>
-- [ ] `DeleteUserMetadata` — user metadata delete <id> --key
-
-### Invite
-- [ ] `CreateInviteCode` — user invite create <id>
-- [ ] `ResendInviteCode` — user invite resend <id>
-- [ ] `VerifyInviteCode` — user invite verify <id> --code
+[ ] RegisterPasskey           user passkey register <id>
+[ ] VerifyPasskeyRegistration user passkey verify <id>
+[ ] CreatePasskeyRegistrationLink  user passkey link <id>
+[ ] RegisterU2F               user u2f register <id>
+[ ] VerifyU2FRegistration     user u2f verify <id>
+[ ] RemoveU2F                 user u2f remove <id> --u2f-id
+[ ] RegisterTOTP              user totp register <id>
+[ ] VerifyTOTPRegistration    user totp verify <id> --code
+[ ] RemoveTOTP                user totp remove <id>
+[ ] AddOTPSMS                 user otp-sms add <id>
+[ ] RemoveOTPSMS              user otp-sms remove <id>
+[ ] AddOTPEmail               user otp-email add <id>
+[ ] RemoveOTPEmail            user otp-email remove <id>
+[ ] GenerateRecoveryCodes     user recovery-codes generate <id>
+[ ] RemoveRecoveryCodes       user recovery-codes remove <id>
+[ ] HumanMFAInitSkipped       user mfa-skip <id>
+[ ] AddSecret                 user secret add <id>
+[ ] RemoveSecret              user secret remove <id>
+[ ] AddKey                    user key add <id>
+[ ] AddPersonalAccessToken    user pat add <id> [--expiration]
+[ ] AddIDPLink                user idp-link add <id> --idp-id
+[ ] CreateInviteCode          user invite create <id>
+[ ] ResendInviteCode          user invite resend <id>
+[ ] VerifyInviteCode          user invite verify <id> --code
+[ ] StartIdentityProviderIntent    (internal/login UI)
+[ ] RetrieveIdentityProviderIntent (internal/login UI)
 
 ---
 
-## OrganizationService (`v2 ✅`)
+## OrganizationService (v2) — 2/14 available in npm package
 
-- [ ] `AddOrganization` — org create --name
-- [ ] `UpdateOrganization` — org update <id> --name
-- [ ] `ListOrganizations` — org list
-- [ ] `DeleteOrganization` — org delete <id>
-- [ ] `DeactivateOrganization` — org deactivate <id>
-- [ ] `ActivateOrganization` — org activate <id>
-
-### Domains
-- [ ] `AddOrganizationDomain` — org domain add <id> --domain
-- [ ] `ListOrganizationDomains` — org domain list <id>
-- [ ] `DeleteOrganizationDomain` — org domain delete <id> --domain
-- [ ] `GenerateOrganizationDomainValidation` — org domain generate-validation <id> --domain
-- [ ] `VerifyOrganizationDomain` — org domain verify <id> --domain
-
-### Metadata
-- [ ] `SetOrganizationMetadata` — org metadata set <id> --key --value
-- [ ] `ListOrganizationMetadata` — org metadata list <id>
-- [ ] `DeleteOrganizationMetadata` — org metadata delete <id> --key
+[x] AddOrganization           org create --name
+[x] ListOrganizations         org list
+[ ] (remaining methods not in npm v2 package)
 
 ---
 
-## SessionService (`v2 ✅`)
+## ProjectService (v2beta) — 6/19 ✅
 
-- [ ] `CreateSession` — session create
-- [ ] `GetSession` — session get <id>
-- [ ] `ListSessions` — session list
-- [ ] `SetSession` — session set <id>
-- [ ] `DeleteSession` — session delete <id>
+[x] GetProject                project get <id>
+[x] ListProjects              project list
+[x] DeleteProject             project delete <id> [--confirm]
+[x] DeactivateProject         project deactivate <id>
+[x] ActivateProject           project activate <id>
 
----
-
-## InstanceService (`v2 🔧` — proto exists, not in client)
-
-- [ ] `GetInstance` — instance get <id>
-- [ ] `ListInstances` — instance list
-- [ ] `UpdateInstance` — instance update <id>
-- [ ] `DeleteInstance` — instance delete <id>
-
-### Custom Domains
-- [ ] `AddCustomDomain` — instance domain add <id> --domain
-- [ ] `RemoveCustomDomain` — instance domain remove <id> --domain
-- [ ] `ListCustomDomains` — instance domain list <id>
-
-### Trusted Domains
-- [ ] `AddTrustedDomain` — instance trusted-domain add <id> --domain
-- [ ] `RemoveTrustedDomain` — instance trusted-domain remove <id> --domain
-- [ ] `ListTrustedDomains` — instance trusted-domain list <id>
+[ ] CreateProject             project create --name
+[ ] UpdateProject             project update <id>
+[ ] AddProjectRole            project role add <id> --key --display-name
+[ ] UpdateProjectRole         project role update <id> --key
+[ ] RemoveProjectRole         project role remove <id> --key
+[ ] ListProjectRoles          project role list <id>
+[ ] CreateProjectGrant        project grant create <id> --org-id
+[ ] UpdateProjectGrant        project grant update <id> --grant-id
+[ ] DeleteProjectGrant        project grant delete <id> --grant-id
+[ ] ActivateProjectGrant      project grant activate <id> --grant-id
+[ ] DeactivateProjectGrant    project grant deactivate <id> --grant-id
+[ ] ListProjectGrants         project grant list <id>
 
 ---
 
-## ProjectService (`v2 🔧`)
+## ApplicationService (v2beta) — 3/12 ✅
 
-- [ ] `CreateProject` — project create --name
-- [ ] `GetProject` — project get <id>
-- [ ] `ListProjects` — project list
-- [ ] `UpdateProject` — project update <id>
-- [ ] `DeleteProject` — project delete <id>
-- [ ] `ActivateProject` — project activate <id>
-- [ ] `DeactivateProject` — project deactivate <id>
+[x] GetApplication            app get <id>
+[x] ListApplications          app list --project-id
+[x] DeleteApplication         app delete <id> --project-id [--confirm]
 
-### Roles
-- [ ] `AddProjectRole` — project role add <id> --key --display-name
-- [ ] `UpdateProjectRole` — project role update <id> --key --display-name
-- [ ] `RemoveProjectRole` — project role remove <id> --key
-- [ ] `ListProjectRoles` — project role list <id>
-
-### Grants
-- [ ] `CreateProjectGrant` — project grant create <id> --org-id
-- [ ] `UpdateProjectGrant` — project grant update <id> --grant-id
-- [ ] `DeleteProjectGrant` — project grant delete <id> --grant-id
-- [ ] `ActivateProjectGrant` — project grant activate <id> --grant-id
-- [ ] `DeactivateProjectGrant` — project grant deactivate <id> --grant-id
-- [ ] `ListProjectGrants` — project grant list <id>
+[ ] CreateApplication         app create --project-id --name
+[ ] UpdateApplication         app update <id> --project-id
+[ ] DeactivateApplication     app deactivate <id> --project-id
+[ ] ReactivateApplication     app reactivate <id> --project-id
+[ ] RegenerateClientSecret    app secret generate --project-id --app-id
+[ ] CreateApplicationKey      app key create --project-id --app-id
+[ ] GetApplicationKey         app key get <id> --project-id --app-id --key-id
+[ ] ListApplicationKeys       app key list --project-id --app-id
+[ ] DeleteApplicationKey      app key delete --project-id --app-id --key-id
 
 ---
 
-## ApplicationService (`v2 🔧`)
+## SessionService — 3/5 ✅
 
-- [ ] `CreateApplication` — app create --project-id --name
-- [ ] `GetApplication` — app get <id> --project-id
-- [ ] `ListApplications` — app list --project-id
-- [ ] `UpdateApplication` — app update <id> --project-id
-- [ ] `DeleteApplication` — app delete <id> --project-id
-- [ ] `DeactivateApplication` — app deactivate <id> --project-id
-- [ ] `ReactivateApplication` — app reactivate <id> --project-id
-- [ ] `GenerateClientSecret` — app secret generate --project-id --app-id
-
-### Application Keys
-- [ ] `CreateApplicationKey` — app key create --project-id --app-id
-- [ ] `GetApplicationKey` — app key get --project-id --app-id --key-id
-- [ ] `ListApplicationKeys` — app key list --project-id --app-id
-- [ ] `DeleteApplicationKey` — app key delete --project-id --app-id --key-id
+[x] GetSession                session get <id>
+[x] ListSessions              session list
+[x] DeleteSession             session delete <id>
+[ ] CreateSession             session create
+[ ] SetSession                session set <id>
 
 ---
 
-## SettingsService (`v2 ✅` — reads only, writes are v1)
+## SettingsService — 11/14 ✅
 
-### Reads
-- [ ] `GetGeneralSettings` — settings general get
-- [ ] `GetLoginSettings` — settings login get [--org-id]
-- [ ] `GetActiveIdentityProviders` — settings active-idps get [--org-id]
-- [ ] `GetPasswordComplexitySettings` — settings password-complexity get [--org-id]
-- [ ] `GetPasswordExpirySettings` — settings password-expiry get [--org-id]
-- [ ] `GetBrandingSettings` — settings branding get [--org-id]
-- [ ] `GetDomainSettings` — settings domain get [--org-id]
-- [ ] `GetLegalAndSupportSettings` — settings legal get [--org-id] (deprecated, use link)
-- [ ] `GetLockoutSettings` — settings lockout get [--org-id]
-- [ ] `GetSecuritySettings` — settings security get
-- [ ] `GetHostedLoginTranslation` — settings hosted-login get --locale
-- [ ] `GetLinkSettings` — settings link get
-- [ ] `GetEffectiveSettings` — settings effective get
+[x] GetGeneralSettings        settings general
+[x] GetLoginSettings          settings login [--org-id]
+[x] GetActiveIdentityProviders settings active-idps [--org-id]
+[x] GetPasswordComplexitySettings settings password-complexity [--org-id]
+[x] GetPasswordExpirySettings settings password-expiry [--org-id]
+[x] GetBrandingSettings       settings branding [--org-id]
+[x] GetDomainSettings         settings domain [--org-id]
+[x] GetLockoutSettings        settings lockout [--org-id]
+[x] GetSecuritySettings       settings security
+[x] GetHostedLoginTranslation settings hosted-login get --locale
+[x] SetHostedLoginTranslation settings hosted-login set --locale --json
 
-### Organization Settings
-- [ ] `SetOrganizationSettings` — settings org set --org-id
-- [ ] `DeleteOrganizationSettings` — settings org delete --org-id
-- [ ] `ListOrganizationSettings` — settings org list
-
-### Writes (v2)
-- [ ] `SetSecuritySettings` — settings security set
-- [ ] `SetHostedLoginTranslation` — settings hosted-login set --locale
-- [ ] `SetLinkSettings` — settings link set
-- [ ] `ResetLinkSettings` — settings link reset
+[ ] GetLegalAndSupportSettings  (deprecated, use link)
+[ ] SetSecuritySettings         settings security-set [--enable-impersonation]
 
 ---
 
-## FeatureService (`v2 ✅`)
+## FeatureService — 12/12 ✅ (all wired)
 
-- [ ] `GetSystemFeatures` — feature system get
-- [ ] `SetSystemFeatures` — feature system set --key --value
-- [ ] `ResetSystemFeatures` — feature system reset --key
-- [ ] `GetInstanceFeatures` — feature instance get <id>
-- [ ] `SetInstanceFeatures` — feature instance set <id> --key --value
-- [ ] `ResetInstanceFeatures` — feature instance reset <id> --key
-- [ ] `GetOrganizationFeatures` — feature org get <id>
-- [ ] `SetOrganizationFeatures` — feature org set <id> --key --value
-- [ ] `ResetOrganizationFeatures` — feature org reset <id> --key
-- [ ] `GetUserFeatures` — feature user get <id>
-- [ ] `SetUserFeatures` — feature user set <id> --key --value
-- [ ] `ResetUserFeatures` — feature user reset <id> --key
-
----
-
-## GroupService (`v2 🔧`)
-
-- [ ] `CreateGroup` — group create --name
-- [ ] `GetGroup` — group get <id>
-- [ ] `ListGroups` — group list
-- [ ] `UpdateGroup` — group update <id>
-- [ ] `DeleteGroup` — group delete <id>
-- [ ] `AddUsersToGroup` — group users add <id> --user-ids
-- [ ] `RemoveUsersFromGroup` — group users remove <id> --user-ids
-- [ ] `ListGroupUsers` — group users list <id>
+[x] GetSystemFeatures         feature system get
+[x] SetSystemFeatures         feature system set --json
+[x] ResetSystemFeatures       feature system reset
+[x] GetInstanceFeatures       feature instance get
+[x] SetInstanceFeatures       feature instance set --json
+[x] ResetInstanceFeatures     feature instance reset
+[x] GetOrganizationFeatures   feature org get <id>
+[x] SetOrganizationFeatures   feature org set <id> --json
+[x] ResetOrganizationFeatures feature org reset <id>
+[x] GetUserFeatures           feature user get <id>
+[x] SetUserFeatures           feature user set <id> --json
+[x] ResetUserFeatures         feature user reset <id>
 
 ---
 
-## IdentityProviderService (`v2 ✅`)
+## AuthorizationService (v2beta) — 4/6 ✅
 
-- [ ] `GetIDPByID` — idp get <id>
-
----
-
-## AuthorizationService (`v2 🔧`)
-
-- [ ] `CreateAuthorization` — authorization create --user-id --project-id --role-keys
-- [ ] `ListAuthorizations` — authorization list
-- [ ] `GetAuthorization` — authorization get <id> (note: proto has `Update` not `Get`)
-- [ ] `UpdateAuthorization` — authorization update <id>
-- [ ] `DeleteAuthorization` — authorization delete <id>
-- [ ] `ActivateAuthorization` — authorization activate <id>
-- [ ] `DeactivateAuthorization` — authorization deactivate <id>
+[x] ListAuthorizations        authorization list
+[x] DeleteAuthorization       authorization delete <id>
+[x] ActivateAuthorization     authorization activate <id>
+[x] DeactivateAuthorization   authorization deactivate <id>
+[ ] CreateAuthorization       authorization create
+[ ] UpdateAuthorization       authorization update <id>
 
 ---
 
-## WebKeyService (`v2 🔧`)
+## WebKeyService — 2/4 ✅
 
-- [ ] `CreateWebKey` — webkey create
-- [ ] `ListWebKeys` — webkey list
-- [ ] `ActivateWebKey` — webkey activate <id>
-- [ ] `DeleteWebKey` — webkey delete <id>
-
----
-
-## OIDCService (`v2 ✅`) — SKIP (custom login UI only)
-
-- [ ] `GetAuthRequest`
-- [ ] `CreateCallback`
-- [ ] `GetDeviceAuthorizationRequest`
-- [ ] `AuthorizeOrDenyDeviceAuthorization`
-
-## SAMLService (`v2 ✅`) — SKIP (custom login UI only)
-
-- [ ] `GetSAMLRequest`
-- [ ] `CreateResponse`
+[x] ListWebKeys               webkey list
+[x] ActivateWebKey            webkey activate <id>
+[ ] CreateWebKey              webkey create
+[ ] DeleteWebKey              webkey delete <id>
 
 ---
 
-## V1 Fallbacks (needed because v2 is incomplete)
+## IdentityProviderService — 1/1 ✅
 
-### AdminService (`v1`) — settings writes
-- [ ] UpdateLoginPolicy
-- [ ] AddIDPToLoginPolicy / RemoveIDPFromLoginPolicy
-- [ ] AddSecondFactorToLoginPolicy / RemoveSecondFactorFromLoginPolicy
-- [ ] AddMultiFactorToLoginPolicy / RemoveMultiFactorFromLoginPolicy
-- [ ] UpdatePasswordComplexityPolicy
-- [ ] UpdatePasswordAgePolicy
-- [ ] UpdateLockoutPolicy
-- [ ] UpdatePrivacyPolicy
-- [ ] UpdateLabelPolicy (branding)
-- [ ] RemoveLabelPolicyLogo / LogoDark / Icon / IconDark / Font
-- [ ] UpdateDomainPolicy
-- [ ] AddCustomDomainPolicy / UpdateCustomDomainPolicy / ResetCustomDomainPolicyToDefault
-- [ ] UpdateOrgIAMPolicy
-- [ ] AddCustomOrgIAMPolicy / UpdateCustomOrgIAMPolicy / ResetCustomOrgIAMPolicyToDefault
-- [ ] AddOIDCSettings / UpdateOIDCSettings
-- [ ] UpdateSMTPConfigPassword / UpdateEmailProviderSMTPPassword
-- [ ] AddNotificationPolicy / UpdateNotificationPolicy
-- [ ] AddInstanceTrustedDomain / RemoveInstanceTrustedDomain
-- [ ] SetSecurityPolicy
+[x] GetIDPByID                idp get <id>
 
-### ManagementService (`v1`) — org-level settings writes
-- [ ] AddCustomLoginPolicy / UpdateCustomLoginPolicy / ResetLoginPolicyToDefault
-- [ ] AddIDPToLoginPolicy / RemoveIDPFromLoginPolicy
-- [ ] AddSecondFactorToLoginPolicy / RemoveSecondFactorFromLoginPolicy
-- [ ] AddMultiFactorToLoginPolicy / RemoveMultiFactorFromLoginPolicy
-- [ ] AddCustomPasswordComplexityPolicy / UpdateCustomPasswordComplexityPolicy / ResetPasswordComplexityPolicyToDefault
-- [ ] AddCustomPasswordAgePolicy / UpdateCustomPasswordAgePolicy / ResetPasswordAgePolicyToDefault
-- [ ] AddCustomLockoutPolicy / UpdateCustomLockoutPolicy / ResetLockoutPolicyToDefault
-- [ ] AddCustomPrivacyPolicy / UpdateCustomPrivacyPolicy / ResetPrivacyPolicyToDefault
-- [ ] AddCustomDomainPolicy / UpdateCustomDomainPolicy / ResetCustomDomainPolicyToDefault
-- [ ] AddCustomOrgIAMPolicy / UpdateCustomOrgIAMPolicy / ResetCustomOrgIAMPolicyToDefault
-- [ ] AddNotificationPolicy / UpdateNotificationPolicy / ResetNotificationPolicyToDefault
-- [ ] AddCustomLabelPolicy / UpdateCustomLabelPolicy / ResetLabelPolicyToDefault / RemoveLabelPolicy*
-- [ ] SetCustomLoginText / ResetCustomLoginTextToDefault
-- [ ] SetDefaultPasswordResetMessageText / ResetCustomPasswordResetMessageTextToDefault
-- [ ] SetDefaultDomainClaimedMessageText / ResetCustomDomainClaimedMessageTextToDefault
-- [ ] SetDefaultPasswordlessRegistrationMessageText / ResetCustomPasswordlessRegistrationMessageTextToDefault
-- [ ] SetDefaultPasswordChangeMessageText / ResetCustomPasswordChangeMessageTextToDefault
-- [ ] AddOrgDomain / RemoveOrgDomain / SetPrimaryOrgDomain
-- [ ] SetHumanInitialPassword / SetHumanPassword
-- [ ] AddPasswordlessRegistration / RemoveHumanPasswordless
-- [ ] AddHumanUser (user create --human fallback)
-- [ ] AddMachineUser (user create --machine fallback)
-- [ ] AddProjectRole / RemoveProjectRole
-- [ ] AddProjectGrant / RemoveProjectGrant
+---
 
-### SystemService (`v1`) — instance lifecycle
-- [ ] Healthz
-- [ ] ListInstances (v2 has it now)
-- [ ] GetInstance (v2 has it now)
-- [ ] CreateInstance — instance create (MISSING in v2!)
-- [ ] UpdateInstance (v2 has it now)
-- [ ] DeleteInstance (v2 has it now)
-- [ ] ListIAMMembers
-- [ ] ExistsDomain
-- [ ] ListDomains / AddDomain / RemoveDomain / SetPrimaryDomain (v2 has custom domains)
-- [ ] ListViews / ClearView
-- [ ] ListFailedEvents / RemoveFailedEvent
-- [ ] AddQuota / SetQuota / RemoveQuota
-- [ ] SetInstanceFeature
-- [ ] SetLimits / BulkSetLimits / ResetLimits
+## InstanceService (v2beta) — 3/10 ✅
+
+[x] GetInstance               instance get <id>
+[x] ListInstances              instance list
+[x] DeleteInstance             instance delete <id> [--confirm]
+[x] UpdateInstance             instance update <id> --name
+[x] AddCustomDomain            instance domain add <id> --domain
+[x] RemoveCustomDomain         instance domain remove <id> --domain
+[x] ListCustomDomains          instance domain list <id>
+[x] AddTrustedDomain           instance trusted-domain add <id> --domain
+[x] RemoveTrustedDomain        instance trusted-domain remove <id> --domain
+[x] ListTrustedDomains         instance trusted-domain list <id>
+
+---
+
+## SystemService (v1) — REST fallback
+
+[x] Instance list              system instance list
+[x] Instance get               system instance get <id>
+[x] Instance create            system instance create --name
+
+---
+
+## Services not yet in npm package
+- GroupService — not available yet
+- OIDCService — skip (login UI only)
+- SAMLService — skip (login UI only)
+- V1 AdminService writes — planned for later
+- V1 ManagementService writes — planned for later
