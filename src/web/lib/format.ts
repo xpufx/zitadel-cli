@@ -5,23 +5,22 @@ export function fmtDate(ts: { seconds?: bigint | number; nanos?: number } | unde
   return new Date(ms).toLocaleString();
 }
 
-export function fmtState(state: string | undefined): { label: string; className: string } {
+export function fmtState(state: string | undefined): { label: string; className: string; variant: "default" | "secondary" | "destructive" | "outline" } {
   switch (state) {
     case "active":
     case "STATE_ACTIVE":
-      return { label: "Active", className: "badge-green" };
+      return { label: "Active", className: "", variant: "default" };
     case "deactivated":
     case "STATE_DEACTIVATED":
-      return { label: "Deactivated", className: "badge-yellow" };
+      return { label: "Deactivated", className: "", variant: "secondary" };
     case "deleted":
     case "STATE_DELETED":
-      return { label: "Deleted", className: "badge-red" };
     case "locked":
     case "STATE_LOCKED":
-      return { label: "Locked", className: "badge-red" };
+      return { label: state.includes("locked") ? "Locked" : "Deleted", className: "", variant: "destructive" };
     case "STATE_REMOVED":
-      return { label: "Removed", className: "badge-gray" };
+      return { label: "Removed", className: "", variant: "outline" };
     default:
-      return { label: state ?? "Unknown", className: "badge-gray" };
+      return { label: state ?? "Unknown", className: "", variant: "outline" };
   }
 }

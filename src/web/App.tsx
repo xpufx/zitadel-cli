@@ -8,7 +8,9 @@ import { UserDetailPage } from "./pages/UserDetail";
 import { OrganizationsPage } from "./pages/Organizations";
 import { OrganizationDetailPage } from "./pages/OrganizationDetail";
 import { ProjectsPage } from "./pages/Projects";
+import { ProjectDetailPage } from "./pages/ProjectDetail";
 import { AppsPage } from "./pages/Apps";
+import { AppDetailPage } from "./pages/AppDetail";
 import { SessionsPage } from "./pages/Sessions";
 import { SettingsPage } from "./pages/Settings";
 import { WebKeysPage } from "./pages/WebKeys";
@@ -42,7 +44,9 @@ function AppRoutes() {
         <Route path="orgs" element={<OrganizationsPage />} />
         <Route path="orgs/:id" element={<OrganizationDetailPage />} />
         <Route path="projects" element={<ProjectsPage />} />
+        <Route path="projects/:id" element={<ProjectDetailPage />} />
         <Route path="apps" element={<AppsPage />} />
+        <Route path="apps/:id" element={<AppDetailPage />} />
         <Route path="sessions" element={<SessionsPage />} />
         <Route path="settings" element={<SettingsPage />} />
         <Route path="webkeys" element={<WebKeysPage />} />

@@ -1,123 +1,85 @@
 import { useEffect, useState } from "react";
-import { useClients } from "../lib/auth";
+import { useClients } from "@/lib/auth";
 import { create } from "@bufbuild/protobuf";
-import { GetGeneralSettingsRequestSchema, GetLoginSettingsRequestSchema, GetPasswordComplexitySettingsRequestSchema, GetPasswordExpirySettingsRequestSchema, GetLockoutSettingsRequestSchema, GetSecuritySettingsRequestSchema, GetBrandingSettingsRequestSchema, GetDomainSettingsRequestSchema } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb.js";
+import { GetPasswordComplexitySettingsRequestSchema, GetLoginSettingsRequestSchema, GetLockoutSettingsRequestSchema, GetDomainSettingsRequestSchema } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb.js";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function SettingsPage() {
   const clients = useClients();
-  const [general, setGeneral] = useState<any>(null);
-  const [login, setLogin] = useState<any>(null);
-  const [passwordComplexity, setPasswordComplexity] = useState<any>(null);
-  const [passwordExpiry, setPasswordExpiry] = useState<any>(null);
+  const [complexity, setComplexity] = useState<any>(null);
+  const [loginPolicy, setLoginPolicy] = useState<any>(null);
   const [lockout, setLockout] = useState<any>(null);
-  const [security, setSecurity] = useState<any>(null);
-  const [branding, setBranding] = useState<any>(null);
   const [domain, setDomain] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     Promise.all([
-      clients.settings.getGeneralSettings(create(GetGeneralSettingsRequestSchema, {})),
-      clients.settings.getLoginSettings(create(GetLoginSettingsRequestSchema, {})),
       clients.settings.getPasswordComplexitySettings(create(GetPasswordComplexitySettingsRequestSchema, {})),
-      clients.settings.getPasswordExpirySettings(create(GetPasswordExpirySettingsRequestSchema, {})),
+      clients.settings.getLoginSettings(create(GetLoginSettingsRequestSchema, {})),
       clients.settings.getLockoutSettings(create(GetLockoutSettingsRequestSchema, {})),
-      clients.settings.getSecuritySettings(create(GetSecuritySettingsRequestSchema, {})),
-      clients.settings.getBrandingSettings(create(GetBrandingSettingsRequestSchema, {})),
       clients.settings.getDomainSettings(create(GetDomainSettingsRequestSchema, {})),
-    ]).then(([gen, log, pc, pe, lo, sec, br, dom]) => {
-      setGeneral(gen);
-      setLogin(log.settings);
-      setPasswordComplexity(pc.settings);
-      setPasswordExpiry(pe.settings);
+    ]).then(([c, lp, lo, d]) => {
+      setComplexity(c.settings);
+      setLoginPolicy(lp.settings);
       setLockout(lo.settings);
-      setSecurity(sec.settings);
-      setBranding(br.settings);
-      setDomain(dom.settings);
-    }).catch((e) => setError(e instanceof Error ? e.message : String(e)))
-    .finally(() => setLoading(false));
+      setDomain(d.settings);
+    }).catch(() => {}).finally(() => setLoading(false));
   }, [clients]);
 
-  if (loading) return <div className="loading">Loading settings...</div>;
-  if (error) return <div className="error">{error}</div>;
+  if (loading) return <div className="text-muted-foreground py-8 text-center">Loading settings...</div>;
 
   return (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-semibold">Settings</h2>
+      <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
+        <Card>
+          <CardHeader><CardTitle className="text-base">Password Complexity</CardTitle></CardHeader>
+          <CardContent className="space-y-2">
+            <Field label="Min Length" value={String(complexity?.minLength ?? "-")} />
+            <Field label="Has Uppercase" value={complexity?.hasUppercase ? "Yes" : "No"} />
+            <Field label="Has Lowercase" value={complexity?.hasLowercase ? "Yes" : "No"} />
+            <Field label="Has Number" value={complexity?.hasNumber ? "Yes" : "No"} />
+            <Field label="Has Symbol" value={complexity?.hasSymbol ? "Yes" : "No"} />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader><CardTitle className="text-base">Login Policy</CardTitle></CardHeader>
+          <CardContent className="space-y-2">
+            <Field label="Allow Username/Password" value={loginPolicy?.allowUsernamePassword ? "Yes" : "No"} />
+            <Field label="Allow Register" value={loginPolicy?.allowRegister ? "Yes" : "No"} />
+            <Field label="Allow External IDP" value={loginPolicy?.allowExternalIdp ? "Yes" : "No"} />
+            <Field label="Force MFA" value={loginPolicy?.forceMfa ? "Yes" : "No"} />
+            <Field label="Passwordless Type" value={loginPolicy?.passkeysType} />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader><CardTitle className="text-base">Lockout Policy</CardTitle></CardHeader>
+          <CardContent className="space-y-2">
+            <Field label="Max Password Attempts" value={String(lockout?.maxPasswordAttempts ?? "Unlimited")} />
+            <Field label="Max OTP Attempts" value={String(lockout?.maxOtpAttempts ?? "Unlimited")} />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader><CardTitle className="text-base">Domain Settings</CardTitle></CardHeader>
+          <CardContent className="space-y-2">
+            <Field label="User Login Must Be Domain" value={domain?.userLoginMustBeDomain ? "Yes" : "No"} />
+            <Field label="Domain Verification" value={domain?.domainVerification ? "Enabled" : "Disabled"} />
+            <Field label="Disable Organization Discovery" value={domain?.disableOrganizationDiscovery ? "Yes" : "No"} />
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+function Field({ label, value }: { label: string; value?: string }) {
+  return (
     <div>
-      <div className="page-header">
-        <h2>Settings</h2>
-        <p>Instance-wide configuration</p>
-      </div>
-
-      <div className="settings-grid">
-        {general && (
-          <div className="card">
-            <h3>General</h3>
-            <div className="detail-field"><div className="label">Default Org ID</div><div className="value" style={{ fontFamily: "monospace", fontSize: "0.8rem" }}>{general.defaultOrgId ?? "-"}</div></div>
-            <div className="detail-field"><div className="label">Languages</div><div className="value">{(general.supportedLanguages ?? []).join(", ") || "-"}</div></div>
-          </div>
-        )}
-
-        {login && (
-          <div className="card">
-            <h3>Login</h3>
-            <div className="detail-field"><div className="label">Allow Username</div><div className="value">{login.allowUserNamePassword ? "Yes" : "No"}</div></div>
-            <div className="detail-field"><div className="label">Allow Register</div><div className="value">{login.allowRegister ? "Yes" : "No"}</div></div>
-            <div className="detail-field"><div className="label">Allow External IDP</div><div className="value">{login.allowExternalIdp ? "Yes" : "No"}</div></div>
-            <div className="detail-field"><div className="label">Force MFA</div><div className="value">{login.forceMfa ? "Yes" : "No"}</div></div>
-          </div>
-        )}
-
-        {passwordComplexity && (
-          <div className="card">
-            <h3>Password Complexity</h3>
-            <div className="detail-field"><div className="label">Min Length</div><div className="value">{passwordComplexity.minLength ?? "-"}</div></div>
-            <div className="detail-field"><div className="label">Requires Upper</div><div className="value">{passwordComplexity.hasUppercase ? "Yes" : "No"}</div></div>
-            <div className="detail-field"><div className="label">Requires Lower</div><div className="value">{passwordComplexity.hasLowercase ? "Yes" : "No"}</div></div>
-            <div className="detail-field"><div className="label">Requires Number</div><div className="value">{passwordComplexity.hasNumber ? "Yes" : "No"}</div></div>
-            <div className="detail-field"><div className="label">Requires Symbol</div><div className="value">{passwordComplexity.hasSymbol ? "Yes" : "No"}</div></div>
-          </div>
-        )}
-
-        {passwordExpiry && (
-          <div className="card">
-            <h3>Password Expiry</h3>
-            <div className="detail-field"><div className="label">Max Age (days)</div><div className="value">{passwordExpiry.maxAgeDays ?? "-"}</div></div>
-            <div className="detail-field"><div className="label">Expire Warning (days)</div><div className="value">{passwordExpiry.expireWarnDays ?? "-"}</div></div>
-          </div>
-        )}
-
-        {lockout && (
-          <div className="card">
-            <h3>Lockout</h3>
-            <div className="detail-field"><div className="label">Max Attempts</div><div className="value">{lockout.maxPasswordAttempts ?? "-"}</div></div>
-            <div className="detail-field"><div className="label">Show Lockout</div><div className="value">{lockout.showLockoutFailure ? "Yes" : "No"}</div></div>
-          </div>
-        )}
-
-        {security && (
-          <div className="card">
-            <h3>Security</h3>
-            <div className="detail-field"><div className="label">Impersonation</div><div className="value">{security.enableImpersonation ? "Enabled" : "Disabled"}</div></div>
-          </div>
-        )}
-
-        {branding && (
-          <div className="card">
-            <h3>Branding</h3>
-            <div className="detail-field"><div className="label">Theme Mode</div><div className="value">{branding.themeMode ?? "-"}</div></div>
-            <div className="detail-field"><div className="label">Font URL</div><div className="value">{branding.fontUrl ?? "-"}</div></div>
-          </div>
-        )}
-
-        {domain && (
-          <div className="card">
-            <h3>Domain</h3>
-            <div className="detail-field"><div className="label">Org User Must Be Domain</div><div className="value">{domain.orgUserMustBeDomain ? "Yes" : "No"}</div></div>
-            <div className="detail-field"><div className="label">Suffix Username</div><div className="value">{domain.suffixUsername ? "Yes" : "No"}</div></div>
-          </div>
-        )}
-      </div>
+      <div className="text-xs font-medium text-muted-foreground">{label}</div>
+      <div className="text-sm">{value || "-"}</div>
     </div>
   );
 }

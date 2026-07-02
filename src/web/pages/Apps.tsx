@@ -1,75 +1,64 @@
 import { useEffect, useState } from "react";
-import { useClients } from "../lib/auth";
-import { fmtDate, fmtState } from "../lib/format";
+import { useClients } from "@/lib/auth";
 import { create } from "@bufbuild/protobuf";
 import { ListApplicationsRequestSchema } from "@zitadel/proto/zitadel/app/v2beta/app_service_pb.js";
+import { fmtDate, fmtState } from "@/lib/format";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Link } from "react-router-dom";
 
 export function AppsPage() {
   const clients = useClients();
   const [apps, setApps] = useState<any[]>([]);
-  const [projectId, setProjectId] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const fetch = (pid: string) => {
-    setLoading(true);
-    setError("");
-    clients.app.listApplications(create(ListApplicationsRequestSchema, { projectId: pid }))
-      .then((res) => setApps(res.applications ?? []))
-      .catch((e) => setError(e instanceof Error ? e.message : String(e)))
+  useEffect(() => {
+    clients.app.listApplications(create(ListApplicationsRequestSchema, { projectId: "" }))
+      .then((res: any) => setApps(res.applications ?? []))
+      .catch((e: unknown) => setError(e instanceof Error ? e.message : String(e)))
       .finally(() => setLoading(false));
-  };
+  }, [clients]);
 
   return (
     <div>
-      <div className="page-header">
-        <h2>Applications</h2>
-        <p>Enter a Project ID to list its applications</p>
-      </div>
-      <div className="card" style={{ display: "flex", gap: "0.5rem", alignItems: "end" }}>
-        <div className="form-group" style={{ flex: 1, margin: 0 }}>
-          <label>Project ID</label>
-          <input
-            placeholder="Enter project ID..."
-            value={projectId}
-            onChange={(e) => setProjectId(e.target.value)}
-          />
-        </div>
-        <button className="btn btn-primary" onClick={() => fetch(projectId)} disabled={!projectId || loading}>
-          {loading ? "Loading..." : "List"}
-        </button>
-      </div>
-      {error && <div className="error">{error}</div>}
-      {!loading && apps.length > 0 && (
-        <div className="card">
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Type</th>
-                <th>State</th>
-                <th>Created</th>
-              </tr>
-            </thead>
-            <tbody>
+      <h2 className="text-2xl font-semibold mb-1">Applications</h2>
+      <p className="text-muted-foreground text-sm mb-4">{loading ? "Loading..." : `${apps.length} application${apps.length !== 1 ? "s" : ""}`}</p>
+      {error && <div className="text-destructive text-sm mb-4">{error}</div>}
+      {apps.length === 0 && !loading ? (
+        <div className="text-center py-8 text-muted-foreground">No applications found</div>
+      ) : (
+        <div className="border rounded-lg">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Project</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>State</TableHead>
+                <TableHead className="hidden lg:table-cell">Created</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {apps.map((a: any) => {
-                const s = fmtState(a.state);
-                const type = a.oidcConfig ? "OIDC" : a.samlConfig ? "SAML" : a.apiConfig ? "API" : "Unknown";
+                const appName = a.oidc?.name ?? a.api?.name ?? a.saml?.name ?? a.id;
+                const appType = a.oidc ? "OIDC" : a.api ? "API" : a.saml ? "SAML" : "Unknown";
+                const appState = fmtState(a.oidc?.state ?? a.api?.state ?? a.saml?.state);
                 return (
-                  <tr key={a.id}>
-                    <td>{a.name}</td>
-                    <td>{type}</td>
-                    <td><span className={`badge ${s.className}`}>{s.label}</span></td>
-                    <td>{fmtDate(a.details?.creationDate)}</td>
-                  </tr>
+                  <TableRow key={a.id}>
+                    <TableCell>
+                      <Link to={`/apps/${a.id}?project=${a.projectId}`} className="font-medium hover:underline">{appName}</Link>
+                    </TableCell>
+                    <TableCell className="font-mono text-xs">{a.projectId}</TableCell>
+                    <TableCell>{appType}</TableCell>
+                    <TableCell><Badge variant={appState.variant}>{appState.label}</Badge></TableCell>
+                    <TableCell className="hidden lg:table-cell">{fmtDate(a.details?.creationDate)}</TableCell>
+                  </TableRow>
                 );
               })}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
-      )}
-      {!loading && projectId && apps.length === 0 && !error && (
-        <div className="empty-state">No applications found for this project</div>
       )}
     </div>
   );

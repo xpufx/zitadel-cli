@@ -11,6 +11,10 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/web/*"]
+    },
     "resolveJsonModule": true,
     "declaration": true,
     "declarationMap": true,

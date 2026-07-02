@@ -1,55 +1,54 @@
 import { useEffect, useState } from "react";
-import { useClients } from "../lib/auth";
-import { fmtDate } from "../lib/format";
+import { useClients } from "@/lib/auth";
 import { create } from "@bufbuild/protobuf";
 import { ListWebKeysRequestSchema } from "@zitadel/proto/zitadel/webkey/v2/webkey_service_pb.js";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 
 export function WebKeysPage() {
   const clients = useClients();
-  const [keys, setKeys] = useState<any[]>([]);
+  const [webKeys, setWebKeys] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     clients.webkey.listWebKeys(create(ListWebKeysRequestSchema, {}))
-      .then((res) => setKeys(res.webKeys ?? []))
-      .catch((e) => setError(e instanceof Error ? e.message : String(e)))
+      .then((res: any) => setWebKeys(res.webKeys ?? []))
+      .catch((e: unknown) => setError(e instanceof Error ? e.message : String(e)))
       .finally(() => setLoading(false));
   }, [clients]);
 
-  if (loading) return <div className="loading">Loading web keys...</div>;
-  if (error) return <div className="error">{error}</div>;
-
   return (
     <div>
-      <div className="page-header">
-        <h2>Web Keys</h2>
-        <p>{keys.length} key{keys.length !== 1 ? "s" : ""}</p>
-      </div>
-      {keys.length === 0 ? (
-        <div className="empty-state">No web keys found</div>
+      <h2 className="text-2xl font-semibold mb-1">Web Keys</h2>
+      <p className="text-muted-foreground text-sm mb-4">{loading ? "Loading..." : `${webKeys.length} key${webKeys.length !== 1 ? "s" : ""}`}</p>
+      {error && <div className="text-destructive text-sm mb-4">{error}</div>}
+      {webKeys.length === 0 && !loading ? (
+        <div className="text-center py-8 text-muted-foreground">No web keys found</div>
       ) : (
-        <div className="card">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Type</th>
-                <th>State</th>
-                <th>Created</th>
-              </tr>
-            </thead>
-            <tbody>
-              {keys.map((k: any) => (
-                <tr key={k.id}>
-                  <td style={{ fontFamily: "monospace", fontSize: "0.8rem" }}>{k.id}</td>
-                  <td>{k.type ?? "-"}</td>
-                  <td>{k.state ?? "-"}</td>
-                  <td>{fmtDate(k.details?.creationDate)}</td>
-                </tr>
+        <div className="border rounded-lg">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>ID</TableHead>
+                <TableHead>Algorithm</TableHead>
+                <TableHead>Use</TableHead>
+                <TableHead>State</TableHead>
+                <TableHead className="hidden sm:table-cell">Created</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {webKeys.map((k: any) => (
+                <TableRow key={k.id}>
+                  <TableCell className="font-mono text-xs">{k.id}</TableCell>
+                  <TableCell>{k.algorithm?.toString() ?? "-"}</TableCell>
+                  <TableCell>{k.use?.toString() ?? "-"}</TableCell>
+                  <TableCell><Badge variant={k.isActive ? "default" : "secondary"}>{k.isActive ? "Active" : "Inactive"}</Badge></TableCell>
+                  <TableCell className="hidden sm:table-cell">{k.details?.creationDate?.seconds ? new Date(Number(k.details.creationDate.seconds) * 1000).toLocaleString() : "-"}</TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       )}
     </div>

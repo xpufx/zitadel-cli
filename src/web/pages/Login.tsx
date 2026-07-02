@@ -1,5 +1,8 @@
 import { useState } from "react";
-import { useAuth } from "../lib/auth";
+import { useAuth } from "@/lib/auth";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 
 export function LoginPage() {
   const { login } = useAuth();
@@ -24,35 +27,39 @@ export function LoginPage() {
   };
 
   return (
-    <div className="login-page">
-      <div className="login-card">
-        <h1>ZITADEL Console</h1>
-        <p>Connect to your ZITADEL instance</p>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Instance URL</label>
-            <input
-              type="url"
-              placeholder="https://zit.mrs.uppidi.com"
-              value={apiUrl}
-              onChange={(e) => setApiUrl(e.target.value)}
-            />
-          </div>
-          <div className="form-group">
-            <label>Personal Access Token (PAT)</label>
-            <input
-              type="password"
-              placeholder="paste your PAT"
-              value={token}
-              onChange={(e) => setToken(e.target.value)}
-            />
-          </div>
-          {error && <div className="error">{error}</div>}
-          <button type="submit" className="btn btn-primary" style={{ width: "100%" }} disabled={loading}>
-            {loading ? "Connecting..." : "Connect"}
-          </button>
-        </form>
-      </div>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-muted/50">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl">ZITADEL Console</CardTitle>
+          <CardDescription>Connect to your ZITADEL instance</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Instance URL</label>
+              <Input
+                type="url"
+                placeholder="https://zit.example.com"
+                value={apiUrl}
+                onChange={(e) => setApiUrl(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Personal Access Token (PAT)</label>
+              <Input
+                type="password"
+                placeholder="paste your PAT"
+                value={token}
+                onChange={(e) => setToken(e.target.value)}
+              />
+            </div>
+            {error && <div className="text-sm text-destructive">{error}</div>}
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Connecting..." : "Connect"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 }
