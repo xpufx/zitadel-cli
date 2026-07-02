@@ -98,4 +98,43 @@ export function settingsCommand(cmd: Command): void {
         printResult(res.identityProviders ?? []);
       } catch (e) { handleError(e); }
     });
+
+  const sec = cmd.command("security-set").description("Set security settings");
+  sec
+    .option("--enable-impersonation")
+    .option("--embedded-iframe <origins>")
+    .action(async (opts) => {
+      try {
+        const req: Record<string, unknown> = {};
+        if (opts.enableImpersonation !== undefined) req.enableImpersonation = true;
+        if (opts.embeddedIframe) req.embeddedIframe = { allowedOrigins: opts.embeddedIframe.split(",") };
+        const res = await getClients().settings.setSecuritySettings(req);
+        printResult(res);
+      } catch (e) { handleError(e); }
+    });
+
+  const hl = cmd.command("hosted-login").description("Hosted login translations");
+  hl
+    .command("get")
+    .requiredOption("--locale <locale>")
+    .option("--org-id <id>")
+    .action(async (opts) => {
+      try {
+        const level = opts.orgId ? { case: "organizationId" as const, value: opts.orgId } : { case: "instance" as const, value: true };
+        const res = await getClients().settings.getHostedLoginTranslation({ level, locale: opts.locale });
+        printResult(res);
+      } catch (e) { handleError(e); }
+    });
+  hl
+    .command("set")
+    .requiredOption("--locale <locale>")
+    .requiredOption("--json <json>")
+    .option("--org-id <id>")
+    .action(async (opts) => {
+      try {
+        const level = opts.orgId ? { case: "organizationId" as const, value: opts.orgId } : { case: "instance" as const, value: true };
+        const res = await getClients().settings.setHostedLoginTranslation({ level, locale: opts.locale, translations: JSON.parse(opts.json) });
+        printResult(res);
+      } catch (e) { handleError(e); }
+    });
 }
