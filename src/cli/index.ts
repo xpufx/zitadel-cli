@@ -7,6 +7,10 @@ import { projectCommand } from "./commands/project";
 import { settingsCommand } from "./commands/settings";
 import { appCommand } from "./commands/app";
 import { featureCommand } from "./commands/feature";
+import { sessionCommand } from "./commands/session";
+import { authorizationCommand } from "./commands/authorization";
+import { webkeyCommand } from "./commands/webkey";
+import { idpCommand } from "./commands/idp";
 
 const program = new Command();
 
@@ -22,6 +26,10 @@ const resources = [
   { name: "settings", description: "Get settings", setup: settingsCommand },
   { name: "app", description: "Manage applications", setup: appCommand },
   { name: "feature", description: "Manage features", setup: featureCommand },
+  { name: "session", description: "Manage sessions", setup: sessionCommand },
+  { name: "authorization", description: "Manage authorizations", setup: authorizationCommand },
+  { name: "webkey", description: "Manage web keys", setup: webkeyCommand },
+  { name: "idp", description: "Identity providers", setup: idpCommand },
 ];
 
 for (const r of resources) {
