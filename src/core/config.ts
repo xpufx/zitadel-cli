@@ -3,6 +3,7 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import { parse } from "smol-toml";
 import type { ZitadelConfig } from "./types";
+import { signSystemJwt } from "./auth";
 
 const ENV_MAP: Record<string, keyof ZitadelConfig> = {
   ZITADEL_API_URL: "apiUrl",
@@ -38,6 +39,11 @@ function loadConfigFile(path: string): Partial<ZitadelConfig> | null {
   }
 }
 
+function resolveKey(keyPath: string): string {
+  if (existsSync(keyPath)) return readFileSync(keyPath, "utf-8");
+  return keyPath;
+}
+
 function loadEnv(): Partial<ZitadelConfig> {
   const result: Record<string, string> = {};
   for (const [env, key] of Object.entries(ENV_MAP)) {
@@ -62,7 +68,19 @@ export function createConfig(): ZitadelConfig {
   };
 
   if (!merged.apiUrl) throw new Error("ZITADEL_API_URL is required");
-  if (!merged.token) throw new Error("ZITADEL_TOKEN is required");
+
+  if (merged.tokenType === "system") {
+    if (!merged.systemKey || !merged.systemUserId) {
+      throw new Error("ZITADEL_SYSTEM_KEY and ZITADEL_SYSTEM_USER_ID required for system auth");
+    }
+    merged.token = signSystemJwt({
+      audience: merged.apiUrl,
+      subject: merged.systemUserId,
+      key: resolveKey(merged.systemKey),
+    });
+  } else if (!merged.token) {
+    throw new Error("ZITADEL_TOKEN is required");
+  }
 
   return merged;
 }

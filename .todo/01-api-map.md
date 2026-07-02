@@ -13,12 +13,12 @@
 ## UserService (`v2 ✅`)
 
 ### Core
-- [ ] `CreateUser` — user create --machine
-- [ ] `AddHumanUser` — user create --human
+- [x] `CreateUser` — user create --machine
+- [x] `AddHumanUser` — user create --human
 - [ ] `GetUserByID` — user get <id>
 - [ ] `ListUsers` — user list
-- [ ] `UpdateUser` — user update <id>
-- [ ] `UpdateHumanUser` — user update <id>
+- [x] `UpdateUser` — user update <id>
+- [x] `UpdateHumanUser` — user update-human <id>
 - [ ] `DeleteUser` — user delete <id>
 - [ ] `DeactivateUser` — user deactivate <id>
 - [ ] `ReactivateUser` — user reactivate <id>
@@ -27,19 +27,19 @@
 
 ### Email
 - [ ] `SetEmail` — user email set <id> --email
-- [ ] `ResendEmailCode` — user email resend-code <id>
-- [ ] `SendEmailCode` — user email send-code <id>
-- [ ] `VerifyEmail` — user email verify <id> --code
+- [x] `ResendEmailCode` — user email resend-code <id>
+- [x] `SendEmailCode` — user email send-code <id>
+- [x] `VerifyEmail` — user email verify <id> --code
 
 ### Phone
 - [ ] `SetPhone` — user phone set <id> --phone
 - [ ] `RemovePhone` — user phone remove <id>
-- [ ] `ResendPhoneCode` — user phone resend-code <id>
-- [ ] `VerifyPhone` — user phone verify <id> --code
+- [x] `ResendPhoneCode` — user phone resend-code <id>
+- [x] `VerifyPhone` — user phone verify <id> --code
 
 ### Password
 - [ ] `SetPassword` — user password set <id>
-- [ ] `PasswordReset` — user password reset <id>
+- [x] `PasswordReset` — user password reset <id>
 
 ### Auth Factors
 - [ ] `RegisterPasskey` — user passkey register <id>

@@ -33,6 +33,7 @@ export const createManagementServiceClient = createClientFor(ManagementService);
 export const createSystemServiceClient = createClientFor(SystemService);
 
 export interface ServiceClients {
+  config: ZitadelConfig;
   user: ReturnType<typeof createUserServiceClient>;
   settings: ReturnType<typeof createSettingsServiceClient>;
   session: ReturnType<typeof createSessionServiceClient>;
@@ -57,6 +58,7 @@ export function createClients(config: ZitadelConfig): ServiceClients {
   }) as Transport;
 
   return {
+    config,
     user: createUserServiceClient(transport),
     settings: createSettingsServiceClient(transport),
     session: createSessionServiceClient(transport),
