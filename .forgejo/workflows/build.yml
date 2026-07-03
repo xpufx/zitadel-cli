@@ -17,10 +17,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install tools
-        user: root
-        run: apk add --no-cache curl jq
-
       - name: Build Docker image & extract binaries
         run: |
           docker build \
@@ -35,26 +31,9 @@ jobs:
 
       - name: Create release & upload binaries
         if: ${{ secrets.CI_TOKEN != '' }}
-        run: |
-          TAG="${{ inputs.tag || github.sha }}"
-          REPO="${{ github.repository }}"
-          API="https://forge.mrs.aager.de/api/v1/repos/${REPO}/releases"
-
-          curl -s -X DELETE "${API}/tags/${TAG}" \
-            -H "Authorization: token ${{ secrets.CI_TOKEN }}" > /dev/null 2>&1 || true
-
-          RELEASE_JSON=$(curl -s -X POST "${API}" \
-            -H "Authorization: token ${{ secrets.CI_TOKEN }}" \
-            -H "Content-Type: application/json" \
-            -d "{\"tag_name\":\"${TAG}\",\"name\":\"${TAG}\",\"body\":\"Release ${TAG}\"}")
-          RELEASE_ID=$(echo "${RELEASE_JSON}" | jq -r '.id')
-
-          for f in dist/zitadel dist/zitadel-mcp; do
-            curl -s -X POST "${API}/${RELEASE_ID}/assets" \
-              -H "Authorization: token ${{ secrets.CI_TOKEN }}" \
-              -F "attachment=@${f}"
-          done
-          echo "Release ${TAG} created with binaries"
+        env:
+          TAG: ${{ inputs.tag }}
+        run: node scripts/release.mjs
 
       - name: Push Docker image
         if: ${{ secrets.CI_TOKEN != '' }}
