@@ -26,6 +26,7 @@ export function printResult(data: unknown): void {
 }
 
 export function stripProto(val: unknown): unknown {
+  if (typeof val === "bigint") return Number(val);
   if (Array.isArray(val)) return val.map(stripProto);
   if (val && typeof val === "object") {
     const obj = val as Record<string, unknown>;

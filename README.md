@@ -29,13 +29,15 @@ The CLI resolves its config in this order (later sources override earlier ones):
 
 ```toml
 api_url = "https://your-instance.zitadel.cloud"
+
+# Regular API operations (users, orgs, projects, apps, sessions, etc.)
+# Uses a static PAT bearer token.
 token = "your_pat_token"
-default_org_id = "org_id"
-token_type = "pat"       # "pat" (default) or "system"
-system_key = """-----BEGIN RSA PRIVATE KEY-----
-...
------END RSA PRIVATE KEY-----"""
-system_user_id = "user_id_for_system_key"
+
+# System-level API operations (system_*, instance_*)
+# Signs a fresh RS256 JWT per request from the RSA private key.
+system_key = "/path/to/system-user-key.pem"
+system_user_id = "systemuser"
 ```
 
 ### Environment variables
@@ -43,16 +45,17 @@ system_user_id = "user_id_for_system_key"
 | Variable | Description |
 |---|---|
 | `ZITADEL_API_URL` | ZITADEL instance URL |
-| `ZITADEL_TOKEN` | PAT bearer token (required when `token_type = pat`) |
+| `ZITADEL_TOKEN` | PAT bearer token for regular API operations |
 | `ZITADEL_ORG_ID` | Default organization ID |
-| `ZITADEL_TOKEN_TYPE` | `pat` (default) or `system` |
-| `ZITADEL_SYSTEM_KEY` | RSA private key for system auth |
-| `ZITADEL_SYSTEM_USER_ID` | User ID for system auth JWT subject |
+| `ZITADEL_SYSTEM_KEY` | RSA private key (path or PEM) for system-level JWT signing |
+| `ZITADEL_SYSTEM_USER_ID` | User ID for system JWT subject |
 
 ### Authentication
 
-- **PAT (`token_type = "pat"`):** set `token` (or `ZITADEL_TOKEN`) — sent as a static Bearer header on every request.
-- **System (`token_type = "system"`):** set `system_key` (RSA private key) and `system_user_id`. The CLI signs an RS256 JWT per request (audience = apiUrl, subject = systemUserId) and sends it as the Bearer token. No static `token` is needed in this mode.
+Two auth methods coexist in the same config — no switching needed.
+
+- **PAT** — used by regular operations (`user_*`, `org_*`, `project_*`, `app_*`, `session_*`, `settings_*`, etc.). Set via `token` (file) or `ZITADEL_TOKEN` (env).
+- **System JWT** — used by system-level operations (`system_*`, `instance_*`). Set `system_key` (RSA private key) and `system_user_id`. Each call signs a fresh RS256 JWT (`aud` = apiUrl, `sub` = systemUserId, 1-hour expiry).
 
 ## Global Flags
 

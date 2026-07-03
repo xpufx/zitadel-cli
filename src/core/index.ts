@@ -6,3 +6,4 @@ export { printResult, setOutputFormat, stripProto } from "./format";
 export type { OutputFormat } from "./format";
 export { handleError } from "./dispatch";
 export { DESC } from "./descriptions";
+export { signSystemJwt } from "./auth";

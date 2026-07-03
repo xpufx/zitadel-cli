@@ -13,6 +13,7 @@ import {
 } from "@zitadel/proto/zitadel/instance/v2beta/instance_service_pb.js";
 import type { ServiceClients } from "../../core";
 import { DESC } from "../../core";
+import { grpcFetch } from "../transport";
 import type { ToolFactory } from "../tools";
 
 export const getInstanceTools: ToolFactory = (clients) => [
@@ -21,7 +22,11 @@ export const getInstanceTools: ToolFactory = (clients) => [
     description: DESC.instance_list,
     inputSchema: { type: "object" as const, properties: {} },
     handler: async () => {
-      const res = await clients.instance.listInstances(create(ListInstancesRequestSchema, { queries: [] }));
+      const res = await grpcFetch<{ instances: unknown[] }>(
+        clients,
+        "zitadel.instance.v2beta.InstanceService/ListInstances",
+        create(ListInstancesRequestSchema, { queries: [] }),
+      );
       return res.instances ?? [];
     },
   },
@@ -34,7 +39,11 @@ export const getInstanceTools: ToolFactory = (clients) => [
       required: ["instanceId"],
     },
     handler: async (args) => {
-      const res = await clients.instance.getInstance(create(GetInstanceRequestSchema, { instanceId: String(args.instanceId) }));
+      const res = await grpcFetch<{ instance: unknown }>(
+        clients,
+        "zitadel.instance.v2beta.InstanceService/GetInstance",
+        create(GetInstanceRequestSchema, { instanceId: String(args.instanceId) }),
+      );
       return res.instance;
     },
   },
@@ -50,10 +59,14 @@ export const getInstanceTools: ToolFactory = (clients) => [
       required: ["instanceId", "name"],
     },
     handler: async (args) => {
-      return await clients.instance.updateInstance(create(UpdateInstanceRequestSchema, {
-        instanceId: String(args.instanceId),
-        instanceName: String(args.name),
-      }));
+      return await grpcFetch(
+        clients,
+        "zitadel.instance.v2beta.InstanceService/UpdateInstance",
+        create(UpdateInstanceRequestSchema, {
+          instanceId: String(args.instanceId),
+          instanceName: String(args.name),
+        }),
+      );
     },
   },
   {
@@ -69,7 +82,11 @@ export const getInstanceTools: ToolFactory = (clients) => [
     },
     handler: async (args) => {
       if (!args.confirm) throw new Error("Use confirm=true to proceed");
-      return await clients.instance.deleteInstance(create(DeleteInstanceRequestSchema, { instanceId: String(args.instanceId) }));
+      return await grpcFetch(
+        clients,
+        "zitadel.instance.v2beta.InstanceService/DeleteInstance",
+        create(DeleteInstanceRequestSchema, { instanceId: String(args.instanceId) }),
+      );
     },
   },
   {
@@ -84,10 +101,14 @@ export const getInstanceTools: ToolFactory = (clients) => [
       required: ["instanceId", "domain"],
     },
     handler: async (args) => {
-      return await clients.instance.addCustomDomain(create(AddCustomDomainRequestSchema, {
-        instanceId: String(args.instanceId),
-        domain: String(args.domain),
-      }));
+      return await grpcFetch(
+        clients,
+        "zitadel.instance.v2beta.InstanceService/AddCustomDomain",
+        create(AddCustomDomainRequestSchema, {
+          instanceId: String(args.instanceId),
+          domain: String(args.domain),
+        }),
+      );
     },
   },
   {
@@ -102,10 +123,14 @@ export const getInstanceTools: ToolFactory = (clients) => [
       required: ["instanceId", "domain"],
     },
     handler: async (args) => {
-      return await clients.instance.removeCustomDomain(create(RemoveCustomDomainRequestSchema, {
-        instanceId: String(args.instanceId),
-        domain: String(args.domain),
-      }));
+      return await grpcFetch(
+        clients,
+        "zitadel.instance.v2beta.InstanceService/RemoveCustomDomain",
+        create(RemoveCustomDomainRequestSchema, {
+          instanceId: String(args.instanceId),
+          domain: String(args.domain),
+        }),
+      );
     },
   },
   {
@@ -117,7 +142,11 @@ export const getInstanceTools: ToolFactory = (clients) => [
       required: ["instanceId"],
     },
     handler: async (args) => {
-      const res = await clients.instance.listCustomDomains(create(ListCustomDomainsRequestSchema, { instanceId: String(args.instanceId) }));
+      const res = await grpcFetch<{ domains: unknown[] }>(
+        clients,
+        "zitadel.instance.v2beta.InstanceService/ListCustomDomains",
+        create(ListCustomDomainsRequestSchema, { instanceId: String(args.instanceId) }),
+      );
       return res.domains ?? [];
     },
   },
@@ -133,10 +162,14 @@ export const getInstanceTools: ToolFactory = (clients) => [
       required: ["instanceId", "domain"],
     },
     handler: async (args) => {
-      return await clients.instance.addTrustedDomain(create(AddTrustedDomainRequestSchema, {
-        instanceId: String(args.instanceId),
-        domain: String(args.domain),
-      }));
+      return await grpcFetch(
+        clients,
+        "zitadel.instance.v2beta.InstanceService/AddTrustedDomain",
+        create(AddTrustedDomainRequestSchema, {
+          instanceId: String(args.instanceId),
+          domain: String(args.domain),
+        }),
+      );
     },
   },
   {
@@ -151,10 +184,14 @@ export const getInstanceTools: ToolFactory = (clients) => [
       required: ["instanceId", "domain"],
     },
     handler: async (args) => {
-      return await clients.instance.removeTrustedDomain(create(RemoveTrustedDomainRequestSchema, {
-        instanceId: String(args.instanceId),
-        domain: String(args.domain),
-      }));
+      return await grpcFetch(
+        clients,
+        "zitadel.instance.v2beta.InstanceService/RemoveTrustedDomain",
+        create(RemoveTrustedDomainRequestSchema, {
+          instanceId: String(args.instanceId),
+          domain: String(args.domain),
+        }),
+      );
     },
   },
   {
@@ -166,7 +203,11 @@ export const getInstanceTools: ToolFactory = (clients) => [
       required: ["instanceId"],
     },
     handler: async (args) => {
-      const res = await clients.instance.listTrustedDomains(create(ListTrustedDomainsRequestSchema, { instanceId: String(args.instanceId) }));
+      const res = await grpcFetch<{ trustedDomain: unknown[] }>(
+        clients,
+        "zitadel.instance.v2beta.InstanceService/ListTrustedDomains",
+        create(ListTrustedDomainsRequestSchema, { instanceId: String(args.instanceId) }),
+      );
       return res.trustedDomain ?? [];
     },
   },

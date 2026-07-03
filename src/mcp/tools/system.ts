@@ -1,27 +1,7 @@
 import type { ServiceClients } from "../../core";
 import { DESC } from "../../core";
+import { sysFetch } from "../transport";
 import type { ToolFactory } from "../tools";
-
-function authHeaders(clients: ServiceClients): Record<string, string> {
-  return {
-    Authorization: `Bearer ${clients.config.token}`,
-    "Content-Type": "application/json",
-  };
-}
-
-async function sysFetch<T>(clients: ServiceClients, path: string, body: object): Promise<T> {
-  const baseUrl = clients.config.apiUrl.replace(/\/+$/, "");
-  const res = await fetch(`${baseUrl}${path}`, {
-    method: "POST",
-    headers: authHeaders(clients),
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ message: res.statusText }));
-    throw new Error(err.message ?? `HTTP ${res.status}`);
-  }
-  return res.json();
-}
 
 export const getSystemTools: ToolFactory = (clients) => [
   {
