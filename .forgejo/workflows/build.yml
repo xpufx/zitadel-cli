@@ -17,24 +17,43 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build Docker image & extract binaries
+      - name: Build Docker image
         run: |
           docker build \
             -t zitadel-cli:latest \
             -t forge.mrs.aager.de/${{ github.repository }}:latest \
             -t forge.mrs.aager.de/${{ github.repository }}:${{ github.sha }} \
             .
-          mkdir -p dist
-          docker run --rm zitadel-cli:latest cat /usr/local/bin/zitadel > dist/zitadel
-          docker run --rm zitadel-cli:latest cat /usr/local/bin/zitadel-mcp > dist/zitadel-mcp
-          chmod +x dist/zitadel dist/zitadel-mcp
 
       - name: Create release & upload binaries
         if: ${{ secrets.CI_TOKEN != '' }}
-        env:
-          CI_TOKEN: ${{ secrets.CI_TOKEN }}
-          TAG: ${{ inputs.tag }}
-        run: node scripts/release.mjs
+        run: |
+          TAG="${{ inputs.tag || github.sha }}"
+          REPO="${{ github.repository }}"
+          API="https://forge.mrs.aager.de/api/v1/repos/${REPO}/releases"
+          AUTH="Authorization: token ${{ secrets.CI_TOKEN }}"
+
+          # Delete existing tag release if present
+          docker run --rm curlimages/curl -s -X DELETE "${API}/tags/${TAG}" \
+            -H "${AUTH}" > /dev/null 2>&1 || true
+
+          # Create release
+          RELEASE_JSON=$(docker run --rm curlimages/curl -s -X POST "${API}" \
+            -H "${AUTH}" \
+            -H "Content-Type: application/json" \
+            -d "{\"tag_name\":\"${TAG}\",\"name\":\"${TAG}\",\"body\":\"Release ${TAG}\"}")
+          RELEASE_ID=$(echo "${RELEASE_JSON}" | node -e "process.stdin.on('data',d=>console.log(JSON.parse(d).id))")
+
+          # Upload binaries by piping from the zitadel-cli image directly
+          for name in zitadel zitadel-mcp; do
+            docker run --rm zitadel-cli:latest cat "/usr/local/bin/${name}" | \
+              docker run --rm -i curlimages/curl -s -X POST \
+                "${API}/${RELEASE_ID}/assets?name=${name}" \
+                -H "${AUTH}" \
+                -H "Content-Type: application/octet-stream" \
+                --data-binary @-
+          done
+          echo "Release ${TAG} created with binaries"
 
       - name: Push Docker image
         if: ${{ secrets.CI_TOKEN != '' }}
