@@ -1,0 +1,62 @@
+name: Build & push
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag (e.g. v0.1.0). Defaults to commit SHA."
+        required: false
+
+jobs:
+  build-push:
+    name: Build & push
+    runs-on: alpine-docker
+    env:
+      DOCKER_HOST: tcp://localhost:2375
+      DOCKER_BUILDKIT: 1
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build binaries
+        run: |
+          docker run --rm -v $PWD:/app -w /app oven/bun:latest \
+            sh -c "bun install --frozen-lockfile && bun run build:binary && bun run build:mcp:binary"
+
+      - name: Create release & upload binaries
+        if: ${{ secrets.CI_TOKEN != '' }}
+        run: |
+          TAG="${{ inputs.tag || github.sha }}"
+          REPO="${{ github.repository }}"
+          API="https://forge.mrs.aager.de/api/v1/repos/${REPO}/releases"
+
+          # Create release (delete existing if tag already used)
+          curl -s -X DELETE "${API}/tags/${TAG}" \
+            -H "Authorization: token ${{ secrets.CI_TOKEN }}" > /dev/null 2>&1 || true
+
+          RELEASE_JSON=$(curl -s -X POST "${API}" \
+            -H "Authorization: token ${{ secrets.CI_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"tag_name\":\"${TAG}\",\"name\":\"${TAG}\",\"body\":\"Release ${TAG}\"}")
+          RELEASE_ID=$(echo "${RELEASE_JSON}" | jq -r '.id')
+
+          for f in dist/zitadel dist/zitadel-mcp; do
+            curl -s -X POST "${API}/${RELEASE_ID}/assets" \
+              -H "Authorization: token ${{ secrets.CI_TOKEN }}" \
+              -F "attachment=@${f}"
+          done
+          echo "Release ${TAG} created with binaries"
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            -t forge.mrs.aager.de/${{ github.repository }}:latest \
+            -t forge.mrs.aager.de/${{ github.repository }}:${{ github.sha }} \
+            .
+
+      - name: Push Docker image
+        if: ${{ secrets.CI_TOKEN != '' }}
+        run: |
+          echo "${{ secrets.CI_TOKEN }}" | docker login forge.mrs.aager.de \
+            --username ${{ github.actor }} --password-stdin
+          docker push forge.mrs.aager.de/${{ github.repository }}:latest
+          docker push forge.mrs.aager.de/${{ github.repository }}:${{ github.sha }}

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { Command } from "commander";
 import pc from "picocolors";
+import { setOutputFormat } from "../core";
 import { userCommand } from "./commands/user";
 import { orgCommand } from "./commands/org";
 import { projectCommand } from "./commands/project";
@@ -19,7 +20,13 @@ const program = new Command();
 program
   .name("zitadel")
   .description("CLI for ZITADEL identity platform")
-  .version("0.0.1");
+  .version("0.0.1")
+  .option("--output <format>", "Output format: table, json, yaml", "table");
+
+program.hook("preAction", (thisCmd) => {
+  const rootOpts = thisCmd.opts();
+  if (rootOpts.output) setOutputFormat(rootOpts.output as "table" | "json" | "yaml");
+});
 
 const resources = [
   { name: "user", description: "Manage users", setup: userCommand },

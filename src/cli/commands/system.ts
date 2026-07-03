@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { printResult, handleError } from "../../core";
+import { printResult, handleError, DESC } from "../../core";
 import { getClients } from "../../state";
 
 const SVC = "/system/v1/";
@@ -62,7 +62,7 @@ async function sysFetch<T>(path: string, body: object): Promise<T> {
 export function systemCommand(cmd: Command): void {
   cmd
     .command("healthz")
-    .description("Check if ZITADEL is running")
+    .description(DESC.system_health)
     .action(async () => {
       try {
         const res = await fetch(`${getClients().config.apiUrl.replace(/\/+$/, "")}/healthz`);
@@ -74,6 +74,7 @@ export function systemCommand(cmd: Command): void {
   const inst = cmd.command("instance").description("Manage instances (system API)");
   inst
     .command("list")
+    .description(DESC.system_instance_list)
     .option("--limit <n>", "", "100")
     .option("--offset <n>", "", "0")
     .action(async (opts) => {
@@ -86,6 +87,7 @@ export function systemCommand(cmd: Command): void {
 
   inst
     .command("get <id>")
+    .description(DESC.system_instance_get)
     .action(async (id) => {
       try {
         const res = await sysFetch<GetInstanceResponse>(`${SVC}instances/${id}`, {});
@@ -95,7 +97,7 @@ export function systemCommand(cmd: Command): void {
 
   inst
     .command("create")
-    .description("Create a new instance")
+    .description(DESC.system_instance_create)
     .requiredOption("--name <name>")
     .action(async (opts) => {
       try {

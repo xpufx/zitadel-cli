@@ -1,0 +1,6 @@
+node_modules/
+dist/
+vendor/
+web/
+.git/
+*.md

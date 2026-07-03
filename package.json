@@ -11,13 +11,18 @@
     "web": "vite",
     "web:build": "vite build",
     "test": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build:binary": "bun build --compile src/cli/index.ts --outfile dist/zitadel",
+    "mcp": "tsx src/mcp/index.ts",
+    "mcp:build": "tsup src/mcp/index.ts --out-dir dist",
+    "build:mcp:binary": "bun build --compile src/mcp/index.ts --outfile dist/zitadel-mcp"
   },
   "dependencies": {
     "@bufbuild/protobuf": "^2.12.1",
     "@connectrpc/connect": "^2.1.2",
     "@connectrpc/connect-node": "^2.1.2",
     "@connectrpc/connect-web": "^2.1.2",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "@radix-ui/react-dialog": "^1.1.18",
     "@radix-ui/react-dropdown-menu": "^2.1.19",
     "@radix-ui/react-scroll-area": "^1.2.13",

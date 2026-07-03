@@ -6,7 +6,7 @@
 
 ---
 
-## UserService — 36/63 ✅
+## UserService — 59/63 ✅
 
 [x] CreateUser               user create --name --org-id
 [x] AddHumanUser              user create-human --email --first-name --last-name --org-id
@@ -42,37 +42,37 @@
 [x] DeleteUserMetadata        user metadata delete <id> --key
 [x] ListAuthenticationMethodTypes  user auth-methods <id>
 [x] ListAuthenticationFactors      user auth-factors <id>
+[x] AddPersonalAccessToken    user pat add <id> [--expiration]
+[x] AddSecret                 user secret add <id>
+[x] RemoveSecret              user secret remove <id>
+[x] AddIDPLink                user idp-link add <id> --idp-id --idp-user-id --idp-username
+[x] RegisterPasskey           user passkey register <id> --domain --authenticator
+[x] VerifyPasskeyRegistration user passkey verify <id> --passkey-id --name --credential
+[x] CreatePasskeyRegistrationLink  user passkey link <id> [--url-template]
+[x] RegisterU2F               user u2f register <id> --domain
+[x] VerifyU2FRegistration     user u2f verify <id> --u2f-id --name --credential
+[x] RemoveU2F                 user u2f remove <id> <u2f-id>
+[x] RegisterTOTP              user totp register <id>
+[x] VerifyTOTPRegistration    user totp verify <id> --code
+[x] RemoveTOTP                user totp remove <id>
+[x] AddOTPSMS                 user otp-sms add <id>
+[x] RemoveOTPSMS              user otp-sms remove <id>
+[x] AddOTPEmail               user otp-email add <id>
+[x] RemoveOTPEmail            user otp-email remove <id>
+[x] HumanMFAInitSkipped       user mfa-skip <id>
+[x] CreateInviteCode          user invite create <id> [--notify-email | --return-code]
+[x] ResendInviteCode          user invite resend <id> [--notify-email | --return-code]
+[x] VerifyInviteCode          user invite verify <id> --code
 
-[ ] RegisterPasskey           user passkey register <id>
-[ ] VerifyPasskeyRegistration user passkey verify <id>
-[ ] CreatePasskeyRegistrationLink  user passkey link <id>
-[ ] RegisterU2F               user u2f register <id>
-[ ] VerifyU2FRegistration     user u2f verify <id>
-[ ] RemoveU2F                 user u2f remove <id> --u2f-id
-[ ] RegisterTOTP              user totp register <id>
-[ ] VerifyTOTPRegistration    user totp verify <id> --code
-[ ] RemoveTOTP                user totp remove <id>
-[ ] AddOTPSMS                 user otp-sms add <id>
-[ ] RemoveOTPSMS              user otp-sms remove <id>
-[ ] AddOTPEmail               user otp-email add <id>
-[ ] RemoveOTPEmail            user otp-email remove <id>
-[ ] GenerateRecoveryCodes     user recovery-codes generate <id>
-[ ] RemoveRecoveryCodes       user recovery-codes remove <id>
-[ ] HumanMFAInitSkipped       user mfa-skip <id>
-[ ] AddSecret                 user secret add <id>
-[ ] RemoveSecret              user secret remove <id>
-[ ] AddKey                    user key add <id>
-[ ] AddPersonalAccessToken    user pat add <id> [--expiration]
-[ ] AddIDPLink                user idp-link add <id> --idp-id
-[ ] CreateInviteCode          user invite create <id>
-[ ] ResendInviteCode          user invite resend <id>
-[ ] VerifyInviteCode          user invite verify <id> --code
+[ ] GenerateRecoveryCodes     user recovery-codes generate <id>  (not in proto package)
+[ ] RemoveRecoveryCodes       user recovery-codes remove <id>    (not in proto package)
+[ ] AddKey                    user key add <id>                  (requires raw public key bytes)
 [ ] StartIdentityProviderIntent    (internal/login UI)
 [ ] RetrieveIdentityProviderIntent (internal/login UI)
 
 ---
 
-## OrganizationService (v2) — 2/14 available in npm package
+## OrganizationService (v2) — 14/14 ✅
 
 [x] CreateOrganization        org create --name
 [x] ListOrganizations         org list
@@ -95,7 +95,7 @@
 
 ---
 
-## ProjectService (v2beta) — 6/19 ✅
+## ProjectService (v2beta) — 17/17 ✅
 
 [x] GetProject                project get <id>
 [x] ListProjects              project list
@@ -117,7 +117,7 @@
 
 ---
 
-## ApplicationService (v2beta) — 3/12 ✅
+## ApplicationService (v2beta) — 12/12 ✅
 
 [x] GetApplication            app get <id>
 [x] ListApplications          app list --project-id
@@ -134,7 +134,7 @@
 
 ---
 
-## SessionService — 3/5 ✅
+## SessionService — 5/5 ✅
 
 [x] GetSession                session get <id>
 [x] ListSessions              session list
@@ -144,7 +144,7 @@
 
 ---
 
-## SettingsService — 11/14 ✅
+## SettingsService — 12/13 ✅
 
 [x] GetGeneralSettings        settings general
 [x] GetLoginSettings          settings login [--org-id]
@@ -157,30 +157,31 @@
 [x] GetSecuritySettings       settings security
 [x] GetHostedLoginTranslation settings hosted-login get --locale
 [x] SetHostedLoginTranslation settings hosted-login set --locale --json
+[x] SetSecuritySettings       settings set-security [--enable-impersonation] [--embedded-css-url] [--embedded-js-url]
 
 [ ] GetLegalAndSupportSettings  (deprecated, use link)
-[ ] SetSecuritySettings         settings security-set [--enable-impersonation]
 
 ---
 
-## FeatureService — 12/12 ✅ (all wired)
+## FeatureService — 9/12 ✅
 
 [x] GetSystemFeatures         feature system get
 [x] SetSystemFeatures         feature system set --json
 [x] ResetSystemFeatures       feature system reset
 [x] GetInstanceFeatures       feature instance get
-[x] SetInstanceFeatures       feature instance set --json
 [x] ResetInstanceFeatures     feature instance reset
 [x] GetOrganizationFeatures   feature org get <id>
-[x] SetOrganizationFeatures   feature org set <id> --json
 [x] ResetOrganizationFeatures feature org reset <id>
 [x] GetUserFeatures           feature user get <id>
-[x] SetUserFeatures           feature user set <id> --json
 [x] ResetUserFeatures         feature user reset <id>
+
+[ ] SetInstanceFeatures       (proto has no feature flags in request)
+[ ] SetOrganizationFeatures   (proto has no feature flags in request)
+[ ] SetUserFeature            (proto has no feature flags in request)
 
 ---
 
-## AuthorizationService (v2beta) — 4/6 ✅
+## AuthorizationService (v2beta) — 6/6 ✅
 
 [x] ListAuthorizations        authorization list
 [x] DeleteAuthorization       authorization delete <id>
@@ -191,7 +192,7 @@
 
 ---
 
-## WebKeyService — 2/4 ✅
+## WebKeyService — 4/4 ✅
 
 [x] ListWebKeys               webkey list
 [x] CreateWebKey              webkey create [--type]
@@ -206,7 +207,7 @@
 
 ---
 
-## InstanceService (v2beta) — 3/10 ✅
+## InstanceService (v2beta) — 10/10 ✅
 
 [x] GetInstance               instance get <id>
 [x] ListInstances              instance list
@@ -221,13 +222,14 @@
 
 ---
 
-## SystemService (v1) — REST fallback, all 24 RPCs in npm package
+## SystemService (v1) — 4/24 (REST fallback)
 
 ### Instance lifecycle
-[ ] Healthz                    system healthz
-[ ] ListInstances              system instance list
-[ ] GetInstance                system instance get <id>
-[ ] CreateInstance             system instance create --name
+[x] Healthz                    system healthz
+[x] ListInstances              system instance list
+[x] GetInstance                system instance get <id>
+[x] CreateInstance             system instance create --name
+
 [ ] UpdateInstance             system instance update <id> --name
 [ ] RemoveInstance             system instance delete <id> [--confirm]
 
