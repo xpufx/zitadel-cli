@@ -32,6 +32,7 @@ jobs:
       - name: Create release & upload binaries
         if: ${{ secrets.CI_TOKEN != '' }}
         env:
+          CI_TOKEN: ${{ secrets.CI_TOKEN }}
           TAG: ${{ inputs.tag }}
         run: node scripts/release.mjs
 
