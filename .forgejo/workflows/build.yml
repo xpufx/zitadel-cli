@@ -17,10 +17,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build binaries
+      - name: Build Docker image & extract binaries
         run: |
-          docker run --rm -v $PWD:/app -w /app oven/bun:latest \
-            sh -c "bun install --frozen-lockfile && bun run build:binary && bun run build:mcp:binary"
+          docker build \
+            -t zitadel-cli:latest \
+            -t forge.mrs.aager.de/${{ github.repository }}:latest \
+            -t forge.mrs.aager.de/${{ github.repository }}:${{ github.sha }} \
+            .
+          mkdir -p dist
+          docker run --rm zitadel-cli:latest cat /usr/local/bin/zitadel > dist/zitadel
+          docker run --rm zitadel-cli:latest cat /usr/local/bin/zitadel-mcp > dist/zitadel-mcp
+          chmod +x dist/zitadel dist/zitadel-mcp
 
       - name: Create release & upload binaries
         if: ${{ secrets.CI_TOKEN != '' }}
@@ -29,7 +36,6 @@ jobs:
           REPO="${{ github.repository }}"
           API="https://forge.mrs.aager.de/api/v1/repos/${REPO}/releases"
 
-          # Create release (delete existing if tag already used)
           curl -s -X DELETE "${API}/tags/${TAG}" \
             -H "Authorization: token ${{ secrets.CI_TOKEN }}" > /dev/null 2>&1 || true
 
@@ -45,13 +51,6 @@ jobs:
               -F "attachment=@${f}"
           done
           echo "Release ${TAG} created with binaries"
-
-      - name: Build Docker image
-        run: |
-          docker build \
-            -t forge.mrs.aager.de/${{ github.repository }}:latest \
-            -t forge.mrs.aager.de/${{ github.repository }}:${{ github.sha }} \
-            .
 
       - name: Push Docker image
         if: ${{ secrets.CI_TOKEN != '' }}
