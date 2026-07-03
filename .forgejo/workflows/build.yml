@@ -17,6 +17,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install tools
+        run: apk add --no-cache curl jq
+
       - name: Build Docker image & extract binaries
         run: |
           docker build \
