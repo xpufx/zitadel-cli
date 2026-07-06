@@ -14,7 +14,7 @@ import {
   ListApplicationKeysRequestSchema,
 } from "@zitadel/proto/zitadel/app/v2beta/app_service_pb.js";
 import type { ServiceClients } from "../../core";
-import { DESC } from "../../core";
+import { DESC, parseGrantTypes, parseResponseTypes, parseAuthMethodType, parseAppType } from "../../core";
 import type { ToolFactory } from "../tools";
 
 export const getAppTools: ToolFactory = (clients) => [
@@ -63,6 +63,36 @@ export const getAppTools: ToolFactory = (clients) => [
           enum: ["oidc", "saml", "api"],
           description: "Application type (default: oidc)",
         },
+        grantTypes: {
+          type: "string",
+          description: "Comma-separated: authorization_code,refresh_token,device_code,... (default: authorization_code)",
+        },
+        redirectUris: {
+          type: "string",
+          description: "Comma-separated redirect URIs",
+        },
+        postLogoutRedirectUris: {
+          type: "string",
+          description: "Comma-separated post-logout redirect URIs",
+        },
+        responseTypes: {
+          type: "string",
+          description: "Comma-separated: code,id_token,id_token_token (default: code)",
+        },
+        authMethodType: {
+          type: "string",
+          enum: ["basic", "post", "none", "private_key_jwt"],
+          description: "OIDC auth method type (default: post)",
+        },
+        appType: {
+          type: "string",
+          enum: ["web", "user_agent", "native"],
+          description: "OIDC application type",
+        },
+        devMode: {
+          type: "boolean",
+          description: "Enable development mode (allows non-compliant settings)",
+        },
       },
       required: ["projectId", "name"],
     },
@@ -73,7 +103,15 @@ export const getAppTools: ToolFactory = (clients) => [
       if (appType === "oidc") {
         creationRequestType = {
           case: "oidcRequest" as const,
-          value: { redirectUris: [], responseTypes: [], grantTypes: [], postLogoutRedirectUris: [], authMethodType: 1 },
+          value: {
+            redirectUris: args.redirectUris ? String(args.redirectUris).split(",").map((s: string) => s.trim()) : [],
+            responseTypes: parseResponseTypes(args.responseTypes as string | undefined),
+            grantTypes: parseGrantTypes(args.grantTypes as string | undefined),
+            postLogoutRedirectUris: args.postLogoutRedirectUris ? String(args.postLogoutRedirectUris).split(",").map((s: string) => s.trim()) : [],
+            authMethodType: parseAuthMethodType(args.authMethodType as string | undefined),
+            appType: parseAppType(args.appType as string | undefined),
+            devMode: args.devMode === true,
+          },
         };
       } else if (appType === "api") {
         creationRequestType = {
@@ -98,15 +136,56 @@ export const getAppTools: ToolFactory = (clients) => [
         id: { type: "string", description: "Application ID" },
         projectId: { type: "string", description: "Project ID" },
         name: { type: "string", description: "New name" },
+        grantTypes: {
+          type: "string",
+          description: "Comma-separated: authorization_code,refresh_token,device_code,...",
+        },
+        redirectUris: {
+          type: "string",
+          description: "Comma-separated redirect URIs (replaces existing)",
+        },
+        postLogoutRedirectUris: {
+          type: "string",
+          description: "Comma-separated post-logout redirect URIs (replaces existing)",
+        },
+        responseTypes: {
+          type: "string",
+          description: "Comma-separated: code,id_token,id_token_token",
+        },
+        authMethodType: {
+          type: "string",
+          enum: ["basic", "post", "none", "private_key_jwt"],
+          description: "OIDC auth method type",
+        },
+        appType: {
+          type: "string",
+          enum: ["web", "user_agent", "native"],
+          description: "OIDC application type",
+        },
+        devMode: {
+          type: "boolean",
+          description: "Enable development mode (allows non-compliant settings)",
+        },
       },
       required: ["id", "projectId"],
     },
     handler: async (args) => {
-      return await clients.app.updateApplication(create(UpdateApplicationRequestSchema, {
-        id: String(args.id),
-        projectId: String(args.projectId),
-        name: args.name ? String(args.name) : undefined,
-      }));
+      const req: Record<string, unknown> = { id: String(args.id), projectId: String(args.projectId) };
+      if (args.name) req.name = String(args.name);
+      if (args.grantTypes || args.redirectUris || args.postLogoutRedirectUris || args.responseTypes || args.authMethodType || args.appType || args.devMode !== undefined) {
+        const oidc: Record<string, unknown> = {
+          grantTypes: parseGrantTypes(args.grantTypes as string | undefined, undefined),
+          redirectUris: args.redirectUris ? String(args.redirectUris).split(",").map((s: string) => s.trim()) : [],
+          postLogoutRedirectUris: args.postLogoutRedirectUris ? String(args.postLogoutRedirectUris).split(",").map((s: string) => s.trim()) : [],
+          responseTypes: parseResponseTypes(args.responseTypes as string | undefined, undefined),
+          authMethodType: parseAuthMethodType(args.authMethodType as string | undefined, undefined),
+        };
+        const appType = parseAppType(args.appType as string | undefined);
+        if (appType !== undefined) oidc.appType = appType;
+        if (args.devMode !== undefined) oidc.devMode = args.devMode === true;
+        req.oidcConfiguration = oidc;
+      }
+      return await clients.app.updateApplication(create(UpdateApplicationRequestSchema, req));
     },
   },
   {

@@ -12,6 +12,7 @@ import { getWebkeyTools } from "./webkey";
 import { getIdpTools } from "./idp";
 import { getSystemTools } from "./system";
 import { getInstanceTools } from "./instance";
+import { getApiTools } from "./api";
 
 export function getToolDefs(clients: ServiceClients): ToolDef[] {
   return [
@@ -27,5 +28,6 @@ export function getToolDefs(clients: ServiceClients): ToolDef[] {
     ...getIdpTools(clients),
     ...getSystemTools(clients),
     ...getInstanceTools(clients),
+    ...getApiTools(clients),
   ];
 }

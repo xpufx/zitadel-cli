@@ -1,7 +1,7 @@
 import { Command } from "commander";
 import { create } from "@bufbuild/protobuf";
 import { ListApplicationsRequestSchema, GetApplicationRequestSchema, DeleteApplicationRequestSchema, CreateApplicationRequestSchema, UpdateApplicationRequestSchema, DeactivateApplicationRequestSchema, ReactivateApplicationRequestSchema, RegenerateClientSecretRequestSchema, CreateApplicationKeyRequestSchema, DeleteApplicationKeyRequestSchema, GetApplicationKeyRequestSchema, ListApplicationKeysRequestSchema } from "@zitadel/proto/zitadel/app/v2beta/app_service_pb.js";
-import { printResult, handleError, DESC } from "../../core";
+import { printResult, handleError, DESC, parseGrantTypes, parseResponseTypes, parseAuthMethodType, parseAppType } from "../../core";
 import { getClients } from "../../state";
 
 export function appCommand(cmd: Command): void {
@@ -15,25 +15,73 @@ export function appCommand(cmd: Command): void {
     catch (e) { handleError(e); }
   });
 
-  cmd.command("create").description(DESC.app_create).requiredOption("--project-id <id>").requiredOption("--name <name>").option("--type <type>", "oidc, saml, or api", "oidc").action(async (opts) => {
-    try {
-      const base = { projectId: opts.projectId, id: "", name: opts.name };
-      let creationRequestType;
-      if (opts.type === "oidc" || opts.type === "api") {
-        creationRequestType = { case: "oidcRequest" as const, value: { redirectUris: [], responseTypes: [], grantTypes: [], postLogoutRedirectUris: [], authMethodType: 1 } };
-      } else if (opts.type === "saml") {
-        creationRequestType = { case: "samlRequest" as const, value: { metadata: { case: "metadataUrl" as const, value: "" } } };
-      } else {
-        creationRequestType = { case: "apiRequest" as const, value: { authMethodType: 1 } };
-      }
-      printResult(await getClients().app.createApplication(create(CreateApplicationRequestSchema, { ...base, creationRequestType })));
-    } catch (e) { handleError(e); }
-  });
+  cmd.command("create").description(DESC.app_create)
+    .requiredOption("--project-id <id>")
+    .requiredOption("--name <name>")
+    .option("--type <type>", "oidc, saml, or api", "oidc")
+    .option("--grant-types <types>", "Comma-separated: authorization_code,refresh_token,device_code,...")
+    .option("--redirect-uris <uris>", "Comma-separated redirect URIs")
+    .option("--post-logout-redirect-uris <uris>", "Comma-separated post-logout URIs")
+    .option("--response-types <types>", "Comma-separated: code,id_token,id_token_token")
+    .option("--auth-method-type <type>", "basic, post, none, or private_key_jwt")
+    .option("--app-type <type>", "web, user_agent, or native")
+    .option("--dev-mode", "Enable development mode (allows non-compliant settings)")
+    .action(async (opts) => {
+      try {
+        const base = { projectId: opts.projectId, id: "", name: opts.name };
+        let creationRequestType;
+        if (opts.type === "oidc") {
+          creationRequestType = {
+            case: "oidcRequest" as const,
+            value: {
+              redirectUris: opts.redirectUris ? opts.redirectUris.split(",").map((s: string) => s.trim()) : [],
+              responseTypes: parseResponseTypes(opts.responseTypes),
+              grantTypes: parseGrantTypes(opts.grantTypes),
+              postLogoutRedirectUris: opts.postLogoutRedirectUris ? opts.postLogoutRedirectUris.split(",").map((s: string) => s.trim()) : [],
+              authMethodType: parseAuthMethodType(opts.authMethodType),
+              appType: parseAppType(opts.appType),
+              devMode: opts.devMode ?? false,
+            },
+          };
+        } else if (opts.type === "saml") {
+          creationRequestType = { case: "samlRequest" as const, value: { metadata: { case: "metadataUrl" as const, value: "" } } };
+        } else {
+          creationRequestType = { case: "apiRequest" as const, value: { authMethodType: 1 } };
+        }
+        printResult(await getClients().app.createApplication(create(CreateApplicationRequestSchema, { ...base, creationRequestType })));
+      } catch (e) { handleError(e); }
+    });
 
-  cmd.command("update <id>").description(DESC.app_update).requiredOption("--project-id <id>").option("--name <name>").action(async (id, opts) => {
-    try { printResult(await getClients().app.updateApplication(create(UpdateApplicationRequestSchema, { id, projectId: opts.projectId, name: opts.name }))); }
-    catch (e) { handleError(e); }
-  });
+  cmd.command("update <id>").description(DESC.app_update)
+    .requiredOption("--project-id <id>")
+    .option("--name <name>")
+    .option("--grant-types <types>", "Comma-separated: authorization_code,refresh_token,device_code,...")
+    .option("--redirect-uris <uris>", "Comma-separated redirect URIs")
+    .option("--post-logout-redirect-uris <uris>", "Comma-separated post-logout URIs")
+    .option("--response-types <types>", "Comma-separated: code,id_token,id_token_token")
+    .option("--auth-method-type <type>", "basic, post, none, or private_key_jwt")
+    .option("--app-type <type>", "web, user_agent, or native")
+    .option("--dev-mode", "Enable development mode (allows non-compliant settings)")
+    .action(async (id, opts) => {
+      try {
+        const req: Record<string, unknown> = { id, projectId: opts.projectId };
+        if (opts.name) req.name = opts.name;
+        if (opts.grantTypes || opts.redirectUris || opts.postLogoutRedirectUris || opts.responseTypes || opts.authMethodType || opts.appType || opts.devMode !== undefined) {
+          const oidc: Record<string, unknown> = {
+            grantTypes: parseGrantTypes(opts.grantTypes),
+            redirectUris: opts.redirectUris ? opts.redirectUris.split(",").map((s: string) => s.trim()) : [],
+            postLogoutRedirectUris: opts.postLogoutRedirectUris ? opts.postLogoutRedirectUris.split(",").map((s: string) => s.trim()) : [],
+            responseTypes: parseResponseTypes(opts.responseTypes),
+            authMethodType: parseAuthMethodType(opts.authMethodType),
+          };
+          const appType = parseAppType(opts.appType);
+          if (appType !== undefined) oidc.appType = appType;
+          if (opts.devMode !== undefined) oidc.devMode = opts.devMode;
+          req.oidcConfiguration = oidc;
+        }
+        printResult(await getClients().app.updateApplication(create(UpdateApplicationRequestSchema, req)));
+      } catch (e) { handleError(e); }
+    });
 
   cmd.command("delete <id>").description(DESC.app_delete).requiredOption("--project-id <id>").option("--confirm").action(async (id, opts) => {
     if (!opts.confirm) { console.error("Use --confirm"); return; }

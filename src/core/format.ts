@@ -30,9 +30,11 @@ export function stripProto(val: unknown): unknown {
   if (Array.isArray(val)) return val.map(stripProto);
   if (val && typeof val === "object") {
     const obj = val as Record<string, unknown>;
-    if (obj.case) return String(obj.case);
     if (obj.seconds !== undefined && obj.nanos !== undefined) {
       return new Date(Number(obj.seconds) * 1000).toISOString();
+    }
+    if (obj.case !== undefined && "value" in obj) {
+      return stripProto(obj.value);
     }
     const cleaned: Record<string, unknown> = {};
     for (const [k, v] of Object.entries(obj)) {

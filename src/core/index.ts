@@ -7,3 +7,4 @@ export type { OutputFormat } from "./format";
 export { handleError } from "./dispatch";
 export { DESC } from "./descriptions";
 export { signSystemJwt } from "./auth";
+export { parseGrantTypes, parseResponseTypes, parseAuthMethodType, parseAppType } from "./oidc";
