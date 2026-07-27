@@ -12,6 +12,7 @@ import {
   GetActiveIdentityProvidersRequestSchema,
   GetHostedLoginTranslationRequestSchema,
   SetHostedLoginTranslationRequestSchema,
+  GetLegalAndSupportSettingsRequestSchema,
 } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb.js";
 import {
   UpdateLoginPolicyRequestSchema,
@@ -189,6 +190,14 @@ export const getSettingsTools: ToolFactory = (clients) => [
     handler: async (args) => {
       const res = await clients.settings.getActiveIdentityProviders(create(GetActiveIdentityProvidersRequestSchema, { ctx: ctx(args.orgId as string | undefined) }));
       return res.identityProviders ?? [];
+    },
+  },
+  {
+    name: "settings_legal_support",
+    description: "Get legal and support settings",
+    inputSchema: { type: "object" as const, properties: {} },
+    handler: async () => {
+      return await clients.settings.getLegalAndSupportSettings(create(GetLegalAndSupportSettingsRequestSchema, {}));
     },
   },
   {

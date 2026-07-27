@@ -1,6 +1,6 @@
 import { Command } from "commander";
 import { create } from "@bufbuild/protobuf";
-import { GetGeneralSettingsRequestSchema, GetLoginSettingsRequestSchema, GetBrandingSettingsRequestSchema, GetPasswordComplexitySettingsRequestSchema, GetPasswordExpirySettingsRequestSchema, GetLockoutSettingsRequestSchema, GetDomainSettingsRequestSchema, GetSecuritySettingsRequestSchema, SetSecuritySettingsRequestSchema, GetActiveIdentityProvidersRequestSchema, GetHostedLoginTranslationRequestSchema, SetHostedLoginTranslationRequestSchema } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb.js";
+import { GetGeneralSettingsRequestSchema, GetLoginSettingsRequestSchema, GetBrandingSettingsRequestSchema, GetPasswordComplexitySettingsRequestSchema, GetPasswordExpirySettingsRequestSchema, GetLockoutSettingsRequestSchema, GetDomainSettingsRequestSchema, GetSecuritySettingsRequestSchema, SetSecuritySettingsRequestSchema, GetActiveIdentityProvidersRequestSchema, GetHostedLoginTranslationRequestSchema, SetHostedLoginTranslationRequestSchema, GetLegalAndSupportSettingsRequestSchema } from "@zitadel/proto/zitadel/settings/v2/settings_service_pb.js";
 import {
   UpdateLoginPolicyRequestSchema, GetLoginPolicyRequestSchema,
   UpdatePasswordComplexityPolicyRequestSchema, GetPasswordComplexityPolicyRequestSchema,
@@ -71,6 +71,10 @@ export function settingsCommand(cmd: Command): void {
     });
   cmd.command("active-idps").description(DESC.settings_active_idps).option("--org-id <id>").action(async (opts) => {
     try { printResult((await getClients().settings.getActiveIdentityProviders(create(GetActiveIdentityProvidersRequestSchema, { ctx: ctx(opts.orgId) }))).identityProviders ?? []); } catch (e) { handleError(e); }
+  });
+
+  cmd.command("legal-support").description(DESC.settings_legal_support).action(async () => {
+    try { printResult(await getClients().settings.getLegalAndSupportSettings(create(GetLegalAndSupportSettingsRequestSchema, {}))); } catch (e) { handleError(e); }
   });
 
   cmd.command("set-login")

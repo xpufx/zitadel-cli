@@ -183,7 +183,7 @@ export const getAppTools: ToolFactory = (clients) => [
         const appType = parseAppType(args.appType as string | undefined);
         if (appType !== undefined) oidc.appType = appType;
         if (args.devMode !== undefined) oidc.devMode = args.devMode === true;
-        req.oidcConfiguration = oidc;
+        req.oidcConfigurationRequest = oidc;
       }
       return await clients.app.updateApplication(create(UpdateApplicationRequestSchema, req));
     },

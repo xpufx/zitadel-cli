@@ -1,6 +1,6 @@
 import { Command } from "commander";
 import { create } from "@bufbuild/protobuf";
-import { ListUsersRequestSchema, GetUserByIDRequestSchema, CreateUserRequestSchema, CreateUserRequest_MachineSchema, DeleteUserRequestSchema, DeactivateUserRequestSchema, ReactivateUserRequestSchema, LockUserRequestSchema, UnlockUserRequestSchema, SetEmailRequestSchema, SetPhoneRequestSchema, RemovePhoneRequestSchema, SetPasswordRequestSchema, PasswordResetRequestSchema, ResendEmailCodeRequestSchema, SendEmailCodeRequestSchema, VerifyEmailRequestSchema, ResendPhoneCodeRequestSchema, VerifyPhoneRequestSchema, ListUserMetadataRequestSchema, SetUserMetadataRequestSchema, DeleteUserMetadataRequestSchema, ListAuthenticationMethodTypesRequestSchema, ListAuthenticationFactorsRequestSchema, ListPasskeysRequestSchema, RemovePasskeyRequestSchema, ListKeysRequestSchema, RemoveKeyRequestSchema, ListPersonalAccessTokensRequestSchema, RemovePersonalAccessTokenRequestSchema, RemoveIDPLinkRequestSchema, ListIDPLinksRequestSchema, AddHumanUserRequestSchema, UpdateUserRequestSchema, UpdateHumanUserRequestSchema, AddPersonalAccessTokenRequestSchema, AddSecretRequestSchema, RemoveSecretRequestSchema, AddIDPLinkRequestSchema, RegisterPasskeyRequestSchema, VerifyPasskeyRegistrationRequestSchema, CreatePasskeyRegistrationLinkRequestSchema, RegisterU2FRequestSchema, VerifyU2FRegistrationRequestSchema, RemoveU2FRequestSchema, RegisterTOTPRequestSchema, VerifyTOTPRegistrationRequestSchema, RemoveTOTPRequestSchema, AddOTPSMSRequestSchema, RemoveOTPSMSRequestSchema, AddOTPEmailRequestSchema, RemoveOTPEmailRequestSchema, HumanMFAInitSkippedRequestSchema, CreateInviteCodeRequestSchema, ResendInviteCodeRequestSchema, VerifyInviteCodeRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb.js";
+import { ListUsersRequestSchema, GetUserByIDRequestSchema, CreateUserRequestSchema, CreateUserRequest_MachineSchema, DeleteUserRequestSchema, DeactivateUserRequestSchema, ReactivateUserRequestSchema, LockUserRequestSchema, UnlockUserRequestSchema, SetEmailRequestSchema, SetPhoneRequestSchema, RemovePhoneRequestSchema, SetPasswordRequestSchema, PasswordResetRequestSchema, ResendEmailCodeRequestSchema, SendEmailCodeRequestSchema, VerifyEmailRequestSchema, ResendPhoneCodeRequestSchema, VerifyPhoneRequestSchema, ListUserMetadataRequestSchema, SetUserMetadataRequestSchema, DeleteUserMetadataRequestSchema, ListAuthenticationMethodTypesRequestSchema, ListAuthenticationFactorsRequestSchema, ListPasskeysRequestSchema, RemovePasskeyRequestSchema, ListKeysRequestSchema, AddKeyRequestSchema, RemoveKeyRequestSchema, ListPersonalAccessTokensRequestSchema, RemovePersonalAccessTokenRequestSchema, RemoveIDPLinkRequestSchema, ListIDPLinksRequestSchema, AddHumanUserRequestSchema, UpdateUserRequestSchema, UpdateHumanUserRequestSchema, AddPersonalAccessTokenRequestSchema, AddSecretRequestSchema, RemoveSecretRequestSchema, AddIDPLinkRequestSchema, RegisterPasskeyRequestSchema, VerifyPasskeyRegistrationRequestSchema, CreatePasskeyRegistrationLinkRequestSchema, RegisterU2FRequestSchema, VerifyU2FRegistrationRequestSchema, RemoveU2FRequestSchema, RegisterTOTPRequestSchema, VerifyTOTPRegistrationRequestSchema, RemoveTOTPRequestSchema, AddOTPSMSRequestSchema, RemoveOTPSMSRequestSchema, AddOTPEmailRequestSchema, RemoveOTPEmailRequestSchema, HumanMFAInitSkippedRequestSchema, CreateInviteCodeRequestSchema, ResendInviteCodeRequestSchema, VerifyInviteCodeRequestSchema } from "@zitadel/proto/zitadel/user/v2/user_service_pb.js";
 import { SetHumanProfileSchema } from "@zitadel/proto/zitadel/user/v2/user_pb.js";
 import { SetHumanEmailSchema } from "@zitadel/proto/zitadel/user/v2/email_pb.js";
 import { ReturnPasskeyRegistrationCodeSchema, SendPasskeyRegistrationLinkSchema } from "@zitadel/proto/zitadel/user/v2/auth_pb.js";
@@ -246,6 +246,16 @@ export function userCommand(cmd: Command): void {
       printResult(await getClients().user.listKeys(req));
     } catch (e) { handleError(e); }
   });
+  cmd.command("key add <id>")
+    .description(DESC.user_key_add)
+    .option("--expiration <date>", "Expiration date (RFC 3339)")
+    .action(async (id, opts) => {
+      try {
+        const req: Record<string, unknown> = { userId: id };
+        if (opts.expiration) req.expirationDate = new Date(opts.expiration).toISOString();
+        printResult(await getClients().user.addKey(create(AddKeyRequestSchema, req)));
+      } catch (e) { handleError(e); }
+    });
   cmd.command("remove-key <id> <key-id>").description(DESC.user_key_remove).action(async (id, keyId) => {
     try {
       const req = create(RemoveKeyRequestSchema, { userId: id, keyId });

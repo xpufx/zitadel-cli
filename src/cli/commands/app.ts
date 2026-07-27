@@ -77,7 +77,7 @@ export function appCommand(cmd: Command): void {
           const appType = parseAppType(opts.appType);
           if (appType !== undefined) oidc.appType = appType;
           if (opts.devMode !== undefined) oidc.devMode = opts.devMode;
-          req.oidcConfiguration = oidc;
+          req.oidcConfigurationRequest = oidc;
         }
         printResult(await getClients().app.updateApplication(create(UpdateApplicationRequestSchema, req)));
       } catch (e) { handleError(e); }

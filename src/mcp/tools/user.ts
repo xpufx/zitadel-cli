@@ -27,6 +27,7 @@ import {
   ListPasskeysRequestSchema,
   RemovePasskeyRequestSchema,
   ListKeysRequestSchema,
+  AddKeyRequestSchema,
   RemoveKeyRequestSchema,
   ListPersonalAccessTokensRequestSchema,
   RemovePersonalAccessTokenRequestSchema,
@@ -505,6 +506,23 @@ export const getUserTools: ToolFactory = (clients) => [
     },
     handler: async (args) => {
       return await clients.user.removeKey(create(RemoveKeyRequestSchema, { userId: String(args.userId), keyId: String(args.keyId) }));
+    },
+  },
+  {
+    name: "user_key_add",
+    description: "Add a key to a machine user",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        userId: { type: "string", description: "User ID" },
+        expiration: { type: "string", description: "Optional expiration date (RFC 3339)" },
+      },
+      required: ["userId"],
+    },
+    handler: async (args) => {
+      const req: Record<string, unknown> = { userId: String(args.userId) };
+      if (args.expiration) req.expirationDate = new Date(String(args.expiration)).toISOString();
+      return await clients.user.addKey(create(AddKeyRequestSchema, req));
     },
   },
   {

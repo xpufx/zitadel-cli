@@ -7,14 +7,17 @@ import {
 import {
   GetInstanceFeaturesRequestSchema,
   ResetInstanceFeaturesRequestSchema,
+  SetInstanceFeaturesRequestSchema,
 } from "@zitadel/proto/zitadel/feature/v2/instance_pb.js";
 import {
   GetOrganizationFeaturesRequestSchema,
   ResetOrganizationFeaturesRequestSchema,
+  SetOrganizationFeaturesRequestSchema,
 } from "@zitadel/proto/zitadel/feature/v2/organization_pb.js";
 import {
   GetUserFeaturesRequestSchema,
   ResetUserFeaturesRequestSchema,
+  SetUserFeatureRequestSchema,
 } from "@zitadel/proto/zitadel/feature/v2/user_pb.js";
 import type { ServiceClients } from "../../core";
 import { DESC } from "../../core";
@@ -71,6 +74,23 @@ export const getFeatureTools: ToolFactory = (clients) => [
     },
   },
   {
+    name: "feature_instance_set",
+    description: "Set instance feature flags",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        json: {
+          type: "object",
+          description: "JSON object with feature flag fields (use feature_instance_get to see schema)",
+        },
+      },
+      required: ["json"],
+    },
+    handler: async (args) => {
+      return await clients.feature.setInstanceFeatures(create(SetInstanceFeaturesRequestSchema, args.json as Record<string, unknown>));
+    },
+  },
+  {
     name: "feature_org_get",
     description: DESC.feature_org_get,
     inputSchema: {
@@ -100,6 +120,28 @@ export const getFeatureTools: ToolFactory = (clients) => [
     },
   },
   {
+    name: "feature_org_set",
+    description: "Set organization feature flags",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        organizationId: { type: "string", description: "Organization ID" },
+        json: {
+          type: "object",
+          description: "JSON object with feature flag fields (use feature_org_get to see schema)",
+        },
+      },
+      required: ["organizationId", "json"],
+    },
+    handler: async (args) => {
+      const req: Record<string, unknown> = {
+        ...(args.json as Record<string, unknown>),
+        organizationId: String(args.organizationId),
+      };
+      return await clients.feature.setOrganizationFeatures(create(SetOrganizationFeaturesRequestSchema, req));
+    },
+  },
+  {
     name: "feature_user_get",
     description: DESC.feature_user_get,
     inputSchema: {
@@ -126,6 +168,28 @@ export const getFeatureTools: ToolFactory = (clients) => [
       return await clients.feature.resetUserFeatures(create(ResetUserFeaturesRequestSchema, {
         userId: String(args.userId),
       }));
+    },
+  },
+  {
+    name: "feature_user_set",
+    description: "Set user feature flags",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        userId: { type: "string", description: "User ID" },
+        json: {
+          type: "object",
+          description: "JSON object with feature flag fields (use feature_user_get to see schema)",
+        },
+      },
+      required: ["userId", "json"],
+    },
+    handler: async (args) => {
+      const req: Record<string, unknown> = {
+        ...(args.json as Record<string, unknown>),
+        userId: String(args.userId),
+      };
+      return await clients.feature.setUserFeatures(create(SetUserFeatureRequestSchema, req));
     },
   },
 ];
