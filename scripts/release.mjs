@@ -4,7 +4,7 @@ import { env } from "node:process";
 const token = env.CI_TOKEN;
 const tag = env.TAG || env.GITHUB_SHA;
 const repo = env.GITHUB_REPOSITORY;
-const api = `https://forge.mrs.aager.de/api/v1/repos/${repo}/releases`;
+const api = `https://forge.mrs.uppidi.com/api/v1/repos/${repo}/releases`;
 const headers = { Authorization: `token ${token}`, "Content-Type": "application/json" };
 
 // Delete existing tag release if present

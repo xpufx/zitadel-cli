@@ -12,13 +12,13 @@ TypeScript CLI + MCP server for managing ZITADEL (IAM). Two binaries, one config
 - **CLI:** `zitadel` — commander-based, ~150 commands
 - **MCP server:** `zitadel-mcp` — stdio transport, ~140 tools, 1:1 with CLI commands
 - **Web UI:** React/Vite frontend (separate, mostly unused)
-- **CI:** Forgejo Actions at `forge.mrs.aager.de/oktay/zitadel-cli` (workflow_dispatch: builds Docker image + release binaries)
+- **CI:** Forgejo Actions at `forge.mrs.uppidi.com/xpufx-org/zitadel-cli` (workflow_dispatch: builds Docker image + release binaries)
 
 ## Repos
 
 | Repo | Path | VCS | Remote |
 |---|---|---|---|
-| zitadel-cli | `/home/xpufx/code/zitadel-cli` | **jj** (git-backed, colocated) | `forge.mrs.aager.de/oktay/zitadel-cli` |
+| zitadel-cli | `/home/xpufx/code/zitadel-cli` | **jj** (git-backed, colocated) | `forge.mrs.uppidi.com/xpufx-org/zitadel-cli` |
 | job-runner | `/home/xpufx/code/job-runner` | git | Forgejo |
 | vendor/zitadel | `/home/xpufx/code/zitadel-cli/vendor/zitadel` | git | `github.com/zitadel/zitadel` (proto source) |
 

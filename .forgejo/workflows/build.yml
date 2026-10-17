@@ -12,7 +12,6 @@ jobs:
     name: Build & push
     runs-on: alpine-docker
     env:
-      DOCKER_HOST: tcp://localhost:2375
       DOCKER_BUILDKIT: 1
     steps:
       - uses: actions/checkout@v4
@@ -21,8 +20,8 @@ jobs:
         run: |
           docker build \
             -t zitadel-cli:latest \
-            -t forge.mrs.aager.de/${{ github.repository }}:latest \
-            -t forge.mrs.aager.de/${{ github.repository }}:${{ github.sha }} \
+            -t forge.mrs.uppidi.com/${{ github.repository }}:latest \
+            -t forge.mrs.uppidi.com/${{ github.repository }}:${{ github.sha }} \
             .
 
       - name: Create release & upload binaries
@@ -30,7 +29,7 @@ jobs:
         run: |
           TAG="${{ inputs.tag || github.sha }}"
           REPO="${{ github.repository }}"
-          API="https://forge.mrs.aager.de/api/v1/repos/${REPO}/releases"
+          API="https://forge.mrs.uppidi.com/api/v1/repos/${REPO}/releases"
           AUTH="Authorization: token ${{ secrets.CI_TOKEN }}"
 
           # Delete existing tag release if present
@@ -58,7 +57,7 @@ jobs:
       - name: Push Docker image
         if: ${{ secrets.CI_TOKEN != '' }}
         run: |
-          echo "${{ secrets.CI_TOKEN }}" | docker login forge.mrs.aager.de \
+          echo "${{ secrets.CI_TOKEN }}" | docker login forge.mrs.uppidi.com \
             --username ${{ github.actor }} --password-stdin
-          docker push forge.mrs.aager.de/${{ github.repository }}:latest
-          docker push forge.mrs.aager.de/${{ github.repository }}:${{ github.sha }}
+          docker push forge.mrs.uppidi.com/${{ github.repository }}:latest
+          docker push forge.mrs.uppidi.com/${{ github.repository }}:${{ github.sha }}
